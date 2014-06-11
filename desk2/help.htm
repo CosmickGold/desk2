@@ -1,0 +1,894 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="en-us" http-equiv="Content-Language" />
+  <title>Desk2: HELP</title>
+  <style>
+    #grayDiv
+    {
+      filter: alpha(opacity=50);
+      -moz-opacity: .50;
+      opacity: .50;
+      background-color: #888888;
+      top: -1230px;
+      height: 1250px;
+      width: 100%;
+      position: relative;
+      z-index: 100;
+    }
+    #noteTable
+    {
+      position: absolute;
+      left: 50%;
+      margin-left: -270px;
+      z-index: 200;
+    }
+    #blueTop
+    {
+      font-weight: 600;
+      font-size: 18px;
+      background-color: #4dace2;
+      border: 1px solid #0C6BA1;
+      max-width: 600px;
+      width: 900px;
+    }
+    .warning
+    {
+      max-width: 600px;
+      padding: 20px;
+      background-color: #eee;
+      border: 1px solid #ccc;
+      font-size: 18px;
+    }
+    .browserinfo
+    {
+      padding: 20px;
+      border: 1px solid #ccc;
+      background-color: #f8f8f8;
+    }
+    a
+    {
+      font-weight: 600;
+    }
+    .txt
+    {
+      height: 38px;
+      width: 234px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+    }
+    .lab
+    {
+      text-align: right;
+      font-family: Arial, Helvetica, sans-serif;
+      width: 235px;
+      font-size: 24px;
+    }
+    .dol
+    {
+      width: 71px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+      text-align: right;
+    }
+    #PartnerIdTxt
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      text-align: center;
+    }
+    #MyIdBtn
+    {
+      font-size: 18px;
+      height: 25px;
+      width: 175px;
+    }
+    #PartnerIdBtn
+    {
+      font-size: 18px;
+      width: 175px;
+      height: 25px;
+    }
+    #problemTxt
+    {
+      height: 230px;
+      width: 410px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 18px;
+    }
+    .sol
+    {
+      width: 564px;
+      height: 36px;
+      font-size: 18px;
+      font-family: "Times New Roman" , Times, serif;
+    }
+    #notesTxt
+    {
+      width: 560px;
+      height: 126px;
+      text-align: center;
+    }
+    #newDateTxt
+    {
+      width: 104px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+    }
+    #ticNumTxt
+    {
+      width: 87px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+    }
+    #custInfoTxt
+    {
+      height: 77px;
+      width: 410px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 18px;
+    }
+    #Button1
+    {
+      height: 18px;
+    }
+    #Button2
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      height: 25px;
+      width: 150px;
+    }
+    #Button3
+    {
+      font-size: 18px;
+      font-family: Arial, Helvetica, sans-serif;
+      height: 25px;
+      width: 150px;
+    }
+    div
+    {
+      border-style: inset;
+      width: 100%;
+      height: 100%;
+      border-color: #CCCCCC;
+      text-align: center;
+    }
+  </style>
+</head>
+<body bgcolor="#e0e0e0" onload="pageLoad()">
+
+  <script type="text/javascript" src="js/note5.js"></script>
+
+  <script type="text/javascript" src="js/jquery.min.js"></script>
+
+  <script type="text/javascript" src="js/peer.js"></script>
+
+  <script language="javascript" type="text/javascript">    
+// <!CDATA[
+      window.onerror = function(msg,url,line)
+      {
+          goNote('*** ERROR ***\n' + msg + '\n\nurl: ' + url + '\nline: ' + line);
+      }
+// ]]>
+  </script>
+
+  <script type="text/javascript" src="js/shared35.js"></script>
+
+  <script type="text/javascript" src="js/phone2.js"></script>
+
+  <script>
+
+
+function pageLoad()
+{
+  grayDiv.style.display = 'none';
+}
+
+function goLight(x)
+{
+  // x.style.cursor = 'pointer'
+  x.children[0].style.display = 'none';
+  x.children[1].style.display = '';
+}
+
+function goDark(x)
+{
+  x.children[0].style.display = '';
+  x.children[1].style.display = 'none';
+}
+
+function thePic(s)
+{
+  if (s == 'MORE')
+    goNote('If on a remote computer,<br>'+
+    'click here to display the same image<br>selected at your base computer.');
+}
+
+function sample(s)
+{
+  if (s == 'Show Sample')
+  {
+    var win = window.open('banner.htm','sample');
+    win.focus();
+  }
+}
+
+function mes(n)
+{
+  switch (n)
+  {
+    case 1: goNote(
+      'On the base computer, click here to select<br>a 900X120 pixel image from your files.\n\n' +
+      'Images of other sizes<br>will be stretched to 900X120 pixels.','MORE','','CLOSE',thePic
+    ); break;
+    case 2: goNote(
+      'To connect to your base computer from a remote computer, enter the same ' +
+      'database name at both locations so the two computers can find each other.<br><br>'+
+      'You can change this name anythime,<br>without affecting the database contents.'
+    ); break;
+    case 3: goNote(
+      'Clicking this button will hide the blue panel.<br><br>' +
+      'Open the blue panel again<br>by clicking your banner picture.'
+    ); break;
+    case 4: goNote(
+      'This is where the header for your form displays.<br><br>' +
+      'Select it using the "Banner Picture" button above.','Show Sample','','Close',sample
+    ); break;
+    case 5: goNote(
+      'This column lists the most important questions,<br>making it easy to remember '+
+      'to ask for password,<br>AC Adapter, etc.<br><br>'+
+      'Use the Enter key to progress down this list.'
+    ); break;
+    case 6: goNote(
+      'This box displays the date<br>the reciept was first saved.'
+    ); break;
+    case 7: goNote(
+      'This box displays the ticket number,<br>beginning with Ticket 1001.'
+    ); break;
+    case 8: goNote(
+      "Here, you can document<br>the computer's problems and needs,<br>add notes about the "+
+      'repair process, etc.'
+    ); break;
+    case 9: goNote(
+      "Enter information about the customer,<br>such as their physical address.<br>"+
+      "which you want to appear again<br>on their future tickets."
+    ); break;
+    case 10: goNote(
+      'If you enter the phone number first,<br>other fields will auto-fill from their '+
+      'last ticket,<br>from "First Name" to "Customer Info".'
+    ); break;
+    case 11: goNote(
+      'This is the amount the customer has already paid.<br>It displays here, and again near the '+
+      'bottom,<br>reducing the total amount currently due.<br><br>The tax remains unchanged,<br>'+
+      'covering both the paid and unpaid portions.'
+    ); break;
+    case 12: goNote(
+      'If still checked, you need to ask the customer<br>if they agree to the repair this line '+
+      'describes.'
+    ); break;
+    case 13: goNote(
+      'Check here, if the customer agrees<br>to the repair this line describes.'
+    ); break;
+    case 14: goNote(
+      'Check here, if the customer does NOT agree<br>to the repair this line describes.<br><br>'+
+      'When "No" is checked, the price font shrinks,<br>and is not added to '+
+      'the total cost of repairs.' 
+    ); break;
+    case 15: goNote(
+      'Check here to indicate the work<br>on this line is compltely finished.'
+    ); break;
+    case 16: goNote(
+      'This text remains the same for all tickets. It is where you can describe your warranty, '+
+      'responsibility limitations, and ask for the customer\'s signature.<br><br>'+
+      'Double-click this box to modify its contents.'
+    ); break;
+    case 17: goNote(
+      'This is the amount the customer has already paid<br>(also shown near the '+
+      'top),<br>reducing the amount currently due.<br><br>But the amount of tax is not '+
+      'changed,<br>being for both paid and unpaid portions.'
+    ); break;
+    case 18: goNote(
+      'The amount currently due (before adding the tax).'
+    ); break;
+    case 19: goNote(
+      'The amount of tax on both the paid<br>and unpaid portions of the bill.<br><br>Since '+
+      '"Subtotal" only shows the amount currently due<br>the full amount taxed will also '+
+      'appear here.'
+    ); break;
+  }
+}
+
+  </script>
+
+  <table id="blueTop" align="center">
+    <tr>
+      <td align="center">
+        <table align="center" style="width: 856px">
+          <tr>
+            <td style="text-align: center; width: 33%">
+              <input id="Button0" type="button" value="Banner Picture" style="font-family: Arial, Helvetica, sans-serif;
+                font-size: 18px; height: 25px; width: 150px;" onclick="mes(1)" />
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)" onclick="mes(1)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+            </td>
+            <td style="text-align: center; width: 34%">
+              <input id="PartnerIdTxt" type="text" onclick="mes(2)" />
+              <input id="Button2" type="button" value="Database Name" onclick="mes(2)" />
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)" onclick="mes(2)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+              <br />
+              <span id="blueNote"></span>
+            </td>
+            <td style="text-align: center; width: 33%">
+              <input id="Button3" type="button" value="Hide Panel" onclick="mes(3)" />
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)" onclick="mes(3)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <table cellpadding="0" cellspacing="0" style="width: 893px; height: 120px;" align="center">
+    <tr>
+      <td bgcolor="#FFFFD0" style="text-align: center; font-family: 'Times New Roman', Times, serif;
+        font-size: 18px;" onclick="mes(4)">
+        Your 900px by 120px banner picture goes here. <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+          <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+          <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+        </span>
+      </td>
+    </tr>
+  </table>
+  <table cellpadding="0" cellspacing="0" style="width: 900px; height: 900px; border-style: solid;
+    border-width: 2px; background-color: #FFFFFF;" align="center">
+    <tr>
+      <td align="center">
+        <table cellpadding="0" cellspacing="0" style="width: 100%; height: 50px">
+          <tr>
+            <td class="lab" style="width: 209px">
+              First Name:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div onclick="mes(5)">
+                <span onmouseout="goDark(this)" onmouseover="goLight(this)">
+                  <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                  <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                </span>
+              </div>
+            </td>
+            <td align="center" rowspan="10">
+              <table align="center" cellpadding="0" cellspacing="0" style="width: 100%; height: 407px;">
+                <tr>
+                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 18px">
+                    <table cellpadding="0" cellspacing="0" style="width: 100%; font-size: 18px; height: 32px;">
+                      <tr>
+                        <td style="width: 33px">
+                          &nbsp;
+                        </td>
+                        <td style="width: 54px; font-size: 20px;">
+                          New:
+                        </td>
+                        <td style="width: 86px">
+                          <div onclick="mes(6)">
+                            <span onmouseout="goDark(this)" onmouseover="goLight(this)">
+                              <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                              <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                            </span>
+                          </div>
+                        </td>
+                        <td style="width: 38px">
+                          &nbsp;
+                        </td>
+                        <td style="width: 59px; font-size: 20px;">
+                          Ticket:
+                        </td>
+                        <td style="width: 86px">
+                          <div onclick="mes(7)">
+                            <span onmouseout="goDark(this)" onmouseover="goLight(this)">
+                              <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                              <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          &nbsp;
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 18px;
+                    text-align: right;">
+                    &nbsp;
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 24px">
+                    <table cellpadding="0" cellspacing="0" style="width: 100%">
+                      <tr>
+                        <td style="width: 20%; text-align: center;">
+                          &nbsp;
+                        </td>
+                        <td style="font-size: 24px; text-align: center">
+                          Problems:
+                          <input id="Button1" type="button" value="UNDO" />
+                        </td>
+                      </tr>
+                    </table>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 20px; height: 230px">
+                    <div onclick="mes(8)">
+                      <br />
+                      <br />
+                      <br />
+                      <br />
+                      <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                        <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                        <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 20px; font-family: 'Times New Roman', Times, serif">
+                    Customer Info:
+                  </td>
+                </tr>
+                <tr>
+                  <td align="center" style="font-size: 20px; height: 77px; font-family: 'Times New Roman', Times, serif">
+                    <div onclick="mes(9)">
+                      <br />
+                      <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                        <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                        <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                      </span>
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Last Name:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Cell Phone:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div onclick="mes(10)">
+                <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                  <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                  <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                </span>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Home Phone:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Computer Make:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Computer Model:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Password:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              AC Adapter Left:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Other Items Left:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div>
+              </div>
+            </td>
+          </tr>
+          <tr>
+            <td class="lab" style="width: 209px">
+              Pre-paid amount:
+            </td>
+            <td style="width: 17px">
+              &nbsp;
+            </td>
+            <td style="width: 245px" height="10%">
+              <div onclick="mes(11)">
+                <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                  <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                  <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+                </span>
+              </div>
+            </td>
+          </tr>
+        </table>
+        <table align="center" cellpadding="0" cellspacing="0" border="1" style="width: 100%;
+          font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
+          <tr>
+            <hr />
+            <td colspan="6" style="text-align: center; font-family: Arial, Helvetica, sans-serif;
+              font-size: 24px">
+              Solutions:
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit1" id="ask1" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit1" id="yes1" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit1" id="no1" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox1" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit2" id="ask2" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit2" id="yes2" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit2" id="no2" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox2" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;" onclick="mes(12)">
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>Ask
+            </td>
+            <td style="width: 60px; height: 41px;" onclick="mes(13)">
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>Yes
+            </td>
+            <td style="width: 57px; height: 41px;" onclick="mes(14)">
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>No
+            </td>
+            <td style="width: 74px; height: 41px;" onclick="mes(15)">
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit4" id="ask4" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit4" id="yes4" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit4" id="no4" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox4" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit5" id="ask5" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit5" id="yes5" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit5" id="no5" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox5" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit6" id="ask6" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit6" id="yes6" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit6" id="no6" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox6" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit7" id="ask7" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit7" id="yes7" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit7" id="no7" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox7" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 41px">
+              .
+            </td>
+            <td style="width: 65px; height: 41px;">
+              <input type="radio" name="doit8" id="ask8" value="ask" checked="checked" />Ask
+            </td>
+            <td style="width: 60px; height: 41px;">
+              <input type="radio" name="doit8" id="yes8" value="ok">
+              Yes
+            </td>
+            <td style="width: 57px; height: 41px;">
+              <input type="radio" name="doit8" id="no8" value="no">No
+            </td>
+            <td style="width: 74px; height: 41px;">
+              <input id="cBox8" type="checkbox" />
+              Done
+            </td>
+            <td style="width: 73px; height: 41px;">
+              .
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: center" rowspan="4" align="center" valign="middle">
+              <span onmouseover="goLight(this)" onmouseout="goDark(this)" onclick="mes(16)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+            </td>
+            <td style="font-size: 18px; text-align: right; height: 41px;" colspan="4"
+              onclick="mes(17)">
+              &nbsp; Pre-paid: &nbsp;
+            </td>
+            <td style="width: 73px; height: 41px;" onclick="mes(17)">
+              . <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="font-size: 18px; text-align: right; height: 41px;" colspan="4"
+              onclick="mes(18)">
+              &nbsp; Subtotal: &nbsp;
+            </td>
+            <td style="width: 73px; height: 41px;" onclick="mes(18)">
+              . <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="text-align: right; font-size: 18px; height: 42px;" colspan="4"
+              onclick="mes(19)">
+              &nbsp; Tax: &nbsp;<span id="taxSpan" style="display: none">on full $<span id="fullAmt">0.00</span>
+                &nbsp;</span>
+            </td>
+            <td style="width: 73px; height: 42px;" onclick="mes(19)">
+              . <span onmouseover="goLight(this)" onmouseout="goDark(this)">
+                <img src="images/helpG.gif" style="width: 25px; height: 24px" />
+                <img src="images/helpG2.gif" style="width: 25px; height: 24px; display: none" />
+              </span>
+            </td>
+          </tr>
+          <tr>
+            <td style="height: 42px; text-align: right; font-size: 18px;" colspan="4">
+              &nbsp; Total due: &nbsp;
+            </td>
+            <td style="width: 73px">
+              .
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+    <tr>
+      <td valign="bottom" style="font-size: 1px;">
+        <div id="grayDiv">
+          &nbsp;
+        </div>
+      </td>
+    </tr>
+  </table>
+  <table id="noteTable" cellpadding="2" style="border-left: 3px solid #000080; border-right: 3px solid #009999;
+    border-top: 3px solid #000080; border-bottom: 3px solid #009999; height: 252px;
+    width: 540px; display: none;" bgcolor="white">
+    <tr>
+      <td align="center">
+        <table style="border-color: #000000; width: 526px;" cellpadding="0" cellspacing="0"
+          border="1" align="center">
+          <tr>
+            <td id="noteTd" bgcolor="#009900" style="height: 179px;">
+              <table cellpadding="0" cellspacing="0" style="width: 100%; height: 100%;">
+                <tr>
+                  <td style="text-align: center">
+                    <span id="NoteMsg" style="color: #DDFFDD; font-size: 22px; font-family: Arial; text-align: center;">
+                      No message.</span>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+          <tr>
+            <td align="center">
+              <table cellpadding="0" cellspacing="0" background="images/pinkCarpet.jpg" style="width: 100%;
+                height: 54px;" align="center">
+                <tr>
+                  <td align="center">
+                    <div id="BnDiv1">
+                      <input id="NoteBtn1" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                        font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                        color: #FFFFFF; height: 50px;" type="button" value="one" onclick="return NoteClick(this.value)" />
+                    </div>
+                  </td>
+                  <td align="center">
+                    <div id="BnDiv2">
+                      <input id="NoteBtn2" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                        font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                        color: #FFFFFF; height: 50px;" type="button" value="two" onclick="return NoteClick(this.value)" />
+                    </div>
+                  </td>
+                  <td align="center">
+                    <div id="BnDiv3">
+                      <input id="NoteBtn3" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                        font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                        color: #FFFFFF; height: 50px;" type="button" value="three" onclick="return NoteClick(this.value)" />
+                    </div>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

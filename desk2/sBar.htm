@@ -1,0 +1,385 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+  <meta http-equiv="expires" content="-1">
+  <meta http-equiv="Expires" content="Fri, Jun 12 1981 08:20:00 GMT">
+  <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  <meta http-equiv="PRAGMA" content="NO-CACHE">
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=0">
+  <link rel="shortcut icon" href="favicon.ico">
+  <title>Menu Bar</title>
+
+  <script type="text/javascript" src="js/shared35.js"></script>
+  <script type="text/javascript" src="js/phone2.js"></script>
+
+  <script language="javascript" type="text/javascript">    
+// <!CDATA[
+        window.onerror = function(msg,url,line)
+        {
+           goNote('*** ERROR ***\n' + msg + '\n\nurl: ' + url + '\nline: ' + line);
+        }
+// ]]>
+// BASE LOCATION: C:\Users\Owner\AppData\Local\Google\Chrome\User Data\Default\databases
+// WHERE (Data = 'new') ORDER BY one, two ASC|DESC LIMIT 1
+  </script>
+
+  <script type="text/javascript">
+<!--
+var askWait = '';
+var nextData = '';
+var wheelTimer = 0;
+var bar2Timer = 0;
+var loginLevel = 0;
+var custInfoTxt,LoginKey,ar;
+var techs = '';
+var Servs = '';
+var calDate6 = '';
+var histDate6 = '';
+var db,request,tktWin;
+var iStrings = new Object;
+var defaults = 'try';
+var keys = new Object;
+var bright = '';
+var LPath = '';
+var sameBar = false;
+var openingBase = false;
+var flashes,oldColor,barTimer,blurTimer,lastS,fByCol;
+
+function pageLoad()
+{
+    //window.applicationCache.addEventListener('error',logEvent);
+    var agnt = navigator.userAgent.toLowerCase();
+    if ((agnt.indexOf('chrome') == -1) /*|| (agnt.indexOf('chromeframe') != -1)*/) // if not Chrome
+    {
+        top.location.href = 'getChrome.htm';
+        return;
+    }
+    if (ParseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1]) < 34) // if older version
+    {
+        parent.lowFrame.location.href = 'UpdateChrome.htm';
+        return;
+    }
+    bar2.style.display = 'none';
+    bar3.style.display = 'none';
+    // window.onfocus = function() { setTimeout('parent.lowFrame.window.focus()',50) }
+    document.body.onselectstart = function() { return false };
+    //document.body.style.cursor = "default";
+    parent.lowFrame.location.href = 'sForm.htm';
+}
+
+function onFocus(obj)
+{
+  obj.style.background = "#FFCCCC";
+}
+
+function onBlur(obj)
+{
+  obj.style.background = "#FFFFFF";
+}
+
+function onError(f,ex) { goNote('ERROR:\r\n'+ f + '\r\n' + ex.message) }
+
+function onReturn()
+{
+  if (event.keyCode == 13)
+    bFindBy('','DESC');
+}
+
+function goBar(bar,str)
+{
+  doKey = onReturn;
+  bar1.style.display = 'none';
+  bar2.style.display = 'none';
+  bar3.style.display = 'none';
+  bar.style.display = 'table';
+  if (bar == bar3)
+  {
+    fByTxt.innerText = str;
+    //findTxt.focus();
+    selectIt(findTxt);
+  }
+}
+
+function bNew()
+{
+  parent.lowFrame.clearTicket();
+}
+
+function bCopy()
+{
+  parent.lowFrame.copyTicket();
+}
+
+
+function bSave()
+{
+  parent.lowFrame.saveTicket();
+}
+
+
+function bPrint()
+{
+  with (parent.lowFrame)
+  {
+    showLog(0);
+    print();
+  }
+}
+
+function bFind()
+{
+  goBar(bar2);
+}
+
+function bfName()
+{
+  findTxt.value = parent.lowFrame.fNameTxt.value;
+  goBar(bar3,'First Name');
+}
+
+function bLName()
+{
+  findTxt.value = parent.lowFrame.LNameTxt.value;
+  goBar(bar3,'Last Name');
+}
+
+function bPhone()
+{
+  if (parent.lowFrame.phoneID == 'hPhoneTxt')
+    findTxt.value = parent.lowFrame.hPhoneTxt.value;
+  else
+    findTxt.value = parent.lowFrame.cPhoneTxt.value;
+  goBar(bar3,'Phone #');
+  doKey = notNumKey;
+}
+
+function bTicket()
+{
+  findTxt.value = parent.lowFrame.ticNumTxt.value;
+  goBar(bar3,'Ticket #');
+}
+
+function bFindBy(val,way)
+{
+  var LT = parent.lowFrame.getTicket;
+  switch (fByTxt.innerText)
+  {
+    case 'First Name': LT('UPPER(fName)=UPPER("'+findTxt.value+'")'+val,way); break;
+    case 'Last Name': LT('UPPER(LName)=UPPER("'+findTxt.value+'")'+val,way); break;
+    case 'Phone #': LT('(cPhone="' +findTxt.value+
+      '") or (hPhone="'+findTxt.value+'")'+val,way); break;
+    case 'Ticket #':LT('ticNum="'+findTxt.value+'"'+val,way); break;
+  }
+}
+
+function bHome()
+{
+  goBar(bar1);
+  with (parent.lowFrame.location)
+  {
+    if (pathname != '/sForm.htm')
+      href = 'msorm.htm';
+  }
+}
+
+function sameNext(GL,way)
+{
+  var TNV = parent.lowFrame.ticNumTxt.value;
+  if (TNV == '(New)')
+    bFindBy('','DESC');
+  else
+    bFindBy(' AND ticNum' +GL+ '"'+TNV+'"',way)
+}
+
+function arrowTicket(GL,SC)
+{
+  findTxt.value = GL;
+  var TNV = parent.lowFrame.ticNumTxt.value;
+  var s;
+  if (TNV == '(New)')
+    s = 'ticNum';
+  else
+    s = 'ticNum' +GL+ '"'+TNV+'"';
+  parent.lowFrame.getTicket(s,SC);
+}
+
+function End_onmouseover(x)
+{
+  switch (x.id)
+  {
+    case 'im1' : x.src = 'images/circleLeftG.gif'; break;
+    case 'im2' : x.src = 'images/circleRightG.gif'; break;
+    case 'im3' : x.src = 'images/circleLeftGR.gif'; break;
+    case 'im4' : x.src = 'images/circleRightGR.gif'; break;
+    case 'im5' : x.src = 'images/circleLeftGR.gif'; break;
+    case 'im6' : x.src = 'images/circleRightGR.gif'; break;
+  }
+  x.style.cursor = 'pointer';
+}
+
+function End_onmouseout(x)
+{
+  switch (x.id)
+  {
+    case 'im1' : x.src = 'images/circleLeft.gif'; break;
+    case 'im2' : x.src = 'images/circleRight.gif'; break;
+    case 'im3' : x.src = 'images/circleLeftWR.gif'; break;
+    case 'im4' : x.src = 'images/circleRightWR.gif'; break;
+    case 'im5' : x.src = 'images/circleLeftWR.gif'; break;
+    case 'im6' : x.src = 'images/circleRightWR.gif'; break;
+  }
+  x.style.cursor = 'default';
+}
+
+// -->
+  </script>
+
+  <style type="text/css">
+    #findTxt
+    {
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+      width: 254px;
+      color: #000000;
+    }
+    #bar1
+    {
+      width: 818px;
+    }
+  </style>
+</head>
+<body bgcolor="#e0e0e0" style="text-align: center" onload="pageLoad()">
+  <table id="bar1" cellpadding="0" cellspacing="0" align="center" style="display: table">
+    <tr>
+      <td style="width: 23px; background-image: url('images/buttonBG6.png');" id="hEnd"
+        onclick="arrowTicket('<','DESC')">
+        <img id="im1" alt="" src="images/circleLeft.gif" style="width: 23px; height: 46px" align="top"
+          onmouseover="return End_onmouseover(this)" onmouseout="return End_onmouseout(this)"/>
+      </td>
+      <td valign="middle">
+        <table align="center" cellpadding="0" cellspacing="6" style="font-size: 28px; font-family: Arial, Helvetica, sans-serif;
+          height: 46px; color: #DDFFDD; left: 0px; width: 100%;" bgcolor="Black">
+          <tr>
+            <td id="hBar" style="text-align: center; font-weight: 700; background-image: url('images/buttonBG.png');
+              color: #DDFFDD;" onclick="return bNew()" valign="middle" onmouseover="return Btn_onmouseover(this)"
+              onmouseout="return Btn_onmouseout(this)">
+              New
+            </td>
+            <td id="pBar" style="font-weight: 700; text-align: center; background-image: url('images/buttonBG.png');
+              color: #DDFFDD;" onclick="return bCopy()" onmouseover="return Btn_onmouseover(this)"
+              onmouseout="return Btn_onmouseout(this)">
+              Copy
+            </td>
+            <td id="cBar" style="text-align: center; font-weight: 700; background-image: url('images/buttonBG.png');
+              color: #DDFFDD;" onclick="return bSave()" onmouseover="return Btn_onmouseover(this)"
+              onmouseout="return Btn_onmouseout(this)">
+              Save
+            </td>
+            <td id="jBar" style="text-align: center; font-weight: 700; background-image: url('images/buttonBG.png');
+              color: #DDFFDD;" onclick="return bPrint()" onmouseover="return Btn_onmouseover(this)"
+              onmouseout="return Btn_onmouseout(this)">
+              Print
+            </td>
+            <td id="iBar" style="text-align: center; font-weight: 700; background-image: url('images/buttonBG.png');
+              color: #DDFFDD;" onclick="return bFind()" onmouseover="return Btn_onmouseover(this)"
+              onmouseout="return Btn_onmouseout(this)">
+              Find
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td style="width: 23px; background-image: url('images/buttonBG6.png');
+        position: relative; left: -16" onclick="arrowTicket('>','ASC')" id="sEnd">
+        <img id="im2" alt="" src="images/circleRight.gif" style="width: 23px; height: 46px;"
+          onmouseover="return End_onmouseover(this)" onmouseout="return End_onmouseout(this)"
+          align="top" />
+      </td>
+    </tr>
+  </table>
+  <table id="bar2" cellpadding="0" cellspacing="0" style="display: table" align="center">
+    <tr>
+      <td style="width: 23px; background-image: url('images/ButtonPurple2.png');"
+        onclick="arrowTicket('<','DESC')">
+        <img id="im3" alt="" src="images/circleLeftWR.gif" style="width: 23px; height: 46px"
+          onmouseover="return End_onmouseover(this)" onmouseout="return End_onmouseout(this)"
+           align="top" />
+      </td>
+      <td valign="middle">
+        <table align="center" cellpadding="0" cellspacing="6" style="font-size: 22px; font-family: Arial, Helvetica, sans-serif;
+          width: 100%; height: 46px; color: #DDFFDD; left: 0px;" bgcolor="Black">
+          <tr>
+            <td id="homeBar" style="text-align: center; font-weight: 700; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 189px; font-size: 28px;" onclick="return bfName()"
+              valign="middle" onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              First Name
+            </td>
+            <td id="questionBar" style="font-weight: 700; text-align: center; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 181px; font-size: 28px;" onclick="return bLName()"
+              onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              Last Name
+            </td>
+            <td id="serviceBar" style="font-weight: 700; text-align: center; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 125px; font-size: 28px;" onclick="return bPhone()"
+              onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              Phone
+            </td>
+            <td id="storeBar" style="text-align: center; font-weight: 700; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 124px; font-size: 28px;" onclick="return bTicket()"
+              onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              Ticket
+            </td>
+            <td id="reportBar" style="text-align: center; font-weight: 700; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 117px; font-size: 28px;" onclick="return bHome()"
+              onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              Home
+            </td>
+          </tr>
+        </table>
+      </td>
+      <td style="width: 23px; background-image: url('images/ButtonPurple2.png'); position: relative;
+        left: -16" onclick="arrowTicket('>','ASC')">
+        <img id="im4" alt="" src="images/circleRightWR.gif" style="width: 23px; height: 46px" align="top"
+          onmouseover="return End_onmouseover(this)" onmouseout="return End_onmouseout(this)" />
+      </td>
+    </tr>
+  </table>
+  <table id="bar3" cellpadding="0" cellspacing="0" align="center">
+    <tr>
+      <td style="width: 23px; background-image: url('images/ButtonPurple2.png');">
+        <img id="im5" alt="" src="images/circleLeftWR.gif" style="width: 23px; height: 46px" align="top"
+          onmouseover="return End_onmouseover(this)" onmouseout="return End_onmouseout(this)"/
+          onclick="sameNext('<','DESC')">
+      </td>
+      <td valign="middle">
+        <table align="center" cellpadding="0" cellspacing="6" style="font-size: 22px; font-family: Arial, Helvetica, sans-serif;
+          width: 100%; height: 46px; color: #DDFFDD; left: 0px;" bgcolor="Black" width="100%">
+          <tr>
+            <td id="Td1" style="text-align: center; font-weight: 700; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 324px; font-size: 28px;" onclick="return bFindBy('','DESC')"
+              valign="middle" onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              Find By <span id="fByTxt"></span>
+            </td>
+            <td id="Td2" style="font-weight: 700; text-align: center; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 310px; font-size: 28px;" onclick="return null"
+              align="center" valign="middle">
+              &nbsp;<input id="findTxt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                onkeypress="doKey(this)" style="height: 20px;" />
+            </td>
+            <td id="Td5" style="text-align: center; font-weight: 700; background-image: url('images/ButtonPurple2.png');
+              color: #FFCCFF; width: 117px; font-size: 28px;" onclick="return bHome()"
+              onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)">
+              Home             </td>
+          </tr>
+        </table>
+      </td>
+      <td style="width: 23px; background-image: url('images/ButtonPurple2.png'); position: relative;
+        left: -16">
+        <img id="im6" alt="" src="images/circleRightWR.gif" style="width: 23px; height: 46px" align="top"
+          onmouseover="return End_onmouseover(this)" onmouseout="return End_onmouseout(this)"
+          onclick="sameNext('>','ASC')" />
+      </td>
+    </tr>
+  </table>
+</body>
+</html>

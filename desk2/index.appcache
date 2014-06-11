@@ -1,0 +1,60 @@
+﻿CACHE MANIFEST
+# 6/8/14
+# test
+# test
+# test
+
+CACHE:
+
+banner.htm
+base.htm
+createDb.htm
+database.htm
+favicon.htm
+getChrome.htm
+help.htm
+home.htm
+mBar.htm
+mForm.htm
+remote.htm
+sBar.htm
+sForm.htm
+UpdateChrome.htm
+
+js/jsjquery.min.js
+js/jsnote5.js
+js/jspeer.js
+js/jsphone2.js
+js/jsshared35.js
+
+bg3p.png
+buttonBG.png
+buttonBG6.png
+buttonBG-dark.png
+ButtonPurple2.png
+circleLeft.gif
+circle-left.gif
+circleLeftG.gif
+circleLeftGR.gif
+circleLeftWR.gif
+circleRight.gif
+circle-right.gif
+circleRightG.gif
+circleRightGR.gif
+circleRightWR.gif
+cntHeader.jpg
+GoogleChrome.png
+helpG.gif
+helpG2.gif
+LB.gif
+LT.gif
+pinkCarpet.png
+processing3.gif
+RB.gif
+RT.gif
+silverPgBk.png
+topBar2.png
+
+
+NETWORK:
+*

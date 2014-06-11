@@ -1,0 +1,794 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+  <meta http-equiv="content-type" content="text/html; charset=utf-8">
+  <meta http-equiv="X-UA-Compatible" content="chrome=0">
+  <meta http-equiv="expires" content="-1">
+  <meta http-equiv="Expires" content="Fri, Jun 12 1981 08:20:00 GMT">
+  <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+  <meta http-equiv="PRAGMA" content="NO-CACHE">
+  <link rel="shortcut icon" href="favicon.ico">
+  <title>Admin</title>
+
+  <script language="javascript" type="text/javascript">    
+// <!CDATA[
+        window.onerror = function(msg,url,line)
+        {
+          goNote('*** ERROR ***\n' + msg + '\n\nurl: ' + url + '\nline: ' + line);
+        }
+// ]]>
+  </script>
+
+  <script type="text/javascript" src="js/shared35.js"></script>
+
+  <script type="text/javascript" src="js/note5.js"></script>
+
+  <script language="javascript" type="text/javascript">
+// <!CDATA[
+
+var allData='Desk2', ar,fileName;
+
+function getFile() { document.getElementById("upFile").click() }
+
+function makeFile(theText)
+{
+    fileName = 'Desk2 ' + now6() + ' ' + Time6() + '.bin';
+    window.requestFileSystem = window.requestFileSystem || window.webkitRequestFileSystem;
+    window.requestFileSystem(window.TEMPORARY,1024 * 1024,function(fs)
+    {
+        fs.root.getFile(fileName,{ create: true },function(fileEntry)
+        {
+            fileEntry.createWriter(function(fileWriter)
+            {
+                //var builder = new WebKitBlobBuilder();
+                //builder.append(theText);
+                //var blob = builder.getBlob();
+                var blob = new Blob([theText], {type: 'text/plain'}); // New, replacing above 3 lines.
+
+                fileWriter.onwriteend = function()
+                {
+                    fileWriter.onwriteend = function()
+                    {
+                        location.href = fileEntry.toURL();
+                        stat('Finished creating the file:  "' + fileName + '"');
+                        if (dbCopy == 'true')
+                            setTimeout("location.href = 'mForm.htm'",6000);
+                    };
+                    fileWriter.write(blob);
+                };
+                fileWriter.truncate(0);
+                //fileWriter.seek(0);
+            },function(x) { fileError(x) })
+        },function(x) { fileError(x) })
+    },function(x) { fileError(x) })
+}
+
+function fileError(e)
+{
+    var msg;
+    switch (e.code)
+    {
+        case FileError.QUOTA_EXCEEDED_ERR:
+            msg = 'Quota exceeded.';
+            break;
+        case FileError.NOT_FOUND_ERR:
+            msg = 'Not found.';
+            break;
+        case FileError.SECURITY_ERR:
+            msg = 'Security error.';
+            break;
+        case FileError.INVALID_MODIFICATION_ERR:
+            msg = 'Invalid modification.';
+            break;
+        case FileError.INVALID_STATE_ERR:
+            msg = 'Invalid state.';
+            break;
+        default:
+            msg = 'Unknown error.';
+            break;
+    };
+    goNote(msg);
+    stat('ERROR:  ' + msg);
+}
+
+function loadFile(files)
+{ 
+  var file = files[0];
+  fileName = file.name;
+  stat('Uploading "' + fileName + '" to database.');
+  var reader = new FileReader();
+  reader.onload = function(e) { restoreBase(e.target.result); }
+  reader.onerror = function(err) { goNote('ERROR:  ' + err); }
+  reader.readAsText(file);
+}
+
+function restoreBase(x)
+{
+    if (x.indexOf('Desk2^extras::') != 0)
+    {
+      goNote('"' + fileName + '" does not appear to be a "Desk2" database file.');
+      return;
+    }
+    ar = x.split('^');
+    restoreExtras();
+}
+
+
+function restoreExtras() //2
+{
+    var i;
+    var aa = ar[1].split('::');
+    var bb = unescape(aa[1]).split('|');
+    var j = bb.length;
+    db.transaction(function(tx)
+    {
+        tx.executeSql("DELETE FROM extras",[],
+            function(tx,result)
+            {
+                for (i = 0; i < bb.length; i++)
+                {
+                    var cc = bb[i].split('&');
+                    tx.executeSql('INSERT INTO extras (eKey, data) ' +
+                        'VALUES (?,?)',[cc[0],cc[1]],
+                        function(tx,result)
+                        {
+                            stat('Finished restoring "extras"');
+                            j--;
+                            if (j < 1)
+                                setTimeout('restoreTickets()',5);
+                        },
+                        function(tx,ex) { onError('Error restoring extras1:  ',ex) }
+                    )
+                }
+            },
+            function(tx,ex) { onError('Error deleting extras2:  ',ex) }
+        );
+    })
+}
+
+function restoreTickets() //3
+{
+    var i;
+    var aa = ar[2].split('::');
+    var bb = unescape(aa[1]).split('|');
+    var j = bb.length;
+    db.transaction(function(tx)
+    {
+        tx.executeSql("DELETE FROM tickets",[],
+            function(tx,result)
+            {
+                for (i = 0; i < bb.length; i++)
+                {
+                    var cc = bb[i].split('&');
+                    tx.executeSql("INSERT INTO tickets (fName, LName, cPhone, hPhone, make, model, pass, adapter, other, " +
+    "prepaid, problems, sol1, sol2, sol3, sol4, sol5, sol6, sol7, sol8, radio, dol1, dol2, " +
+    "dol3, dol4, dol5, dol6, dol7, dol8, taxOn, subT, tax, total, newDate, ticNum, custInfo)"+
+    " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+                        [cc[0],cc[1],cc[2],cc[3],cc[4],cc[5],cc[6],cc[7],cc[8],cc[9],cc[10],cc[11],
+                        cc[12],cc[13],cc[14],cc[15],cc[16],cc[17],cc[18],cc[19],cc[20],cc[21],
+                        cc[22],cc[23],cc[24],cc[25],cc[26],cc[27],cc[28],cc[29],cc[30],cc[31],
+                        cc[32],cc[33],cc[34]],
+                        function(tx,result)
+                        {
+                            stat('Finished restoring "tickets" and database');
+                        },
+                        function(tx,ex) { onError('Error restoring tickets1:\r\n',ex) }
+                    )
+                }
+            },
+            function(tx,ex) { onError('Error deleting tickets2:  ',ex) }
+        );
+    })
+}
+
+function getExtrasA()//2
+{
+    db.transaction(function(tx)
+    {
+        tx.executeSql
+        (
+            "SELECT * FROM extras",[],
+            function(tx,result) { getExtrasB(result); },
+            function(tx,ex) { onError('getExtrasA',ex) }
+        )
+    })
+}
+
+function getExtrasB(x)
+{
+    stat('Reading Extras...');
+
+    var extras = '';
+    for (var i = 0; i < x.rows.length; i++)
+    {
+        extras +=       x.rows.item(i).eKey;
+        extras += '&' + x.rows.item(i).data + '|';
+    }
+    allData += '^extras::' + escape(cutLast(extras));
+    getticketsA();
+}
+
+function getticketsA()//3
+{
+    db.transaction(function(tx)
+    {
+        tx.executeSql
+        (
+            "SELECT * FROM tickets",[],
+            function(tx,result) { getticketsB(result); },
+            function(tx,ex) { onError('getticketsA',ex) }
+        )
+    })
+}
+
+function getticketsB(x)
+{
+    stat('Reading Tickets...');
+    var Tickets = '';
+    for (var i = 0; i < x.rows.length; i++)
+    {
+        Tickets +=       x.rows.item(i).fName;
+        Tickets += '&' + x.rows.item(i).LName;
+        Tickets += '&' + x.rows.item(i).cPhone;
+        Tickets += '&' + x.rows.item(i).hPhone;
+        Tickets += '&' + x.rows.item(i).make;
+        Tickets += '&' + x.rows.item(i).model;
+        Tickets += '&' + x.rows.item(i).pass;
+        Tickets += '&' + x.rows.item(i).adapter;
+        Tickets += '&' + x.rows.item(i).other;
+        Tickets += '&' + x.rows.item(i).prepaid;
+        Tickets += '&' + x.rows.item(i).problems;
+        Tickets += '&' + x.rows.item(i).sol1;
+        Tickets += '&' + x.rows.item(i).sol2;
+        Tickets += '&' + x.rows.item(i).sol3;
+        Tickets += '&' + x.rows.item(i).sol4;
+        Tickets += '&' + x.rows.item(i).sol5;
+        Tickets += '&' + x.rows.item(i).sol6;
+        Tickets += '&' + x.rows.item(i).sol7;
+        Tickets += '&' + x.rows.item(i).sol8;
+        Tickets += '&' + x.rows.item(i).radio;
+        Tickets += '&' + x.rows.item(i).dol1;
+        Tickets += '&' + x.rows.item(i).dol2;
+        Tickets += '&' + x.rows.item(i).dol3;
+        Tickets += '&' + x.rows.item(i).dol4;
+        Tickets += '&' + x.rows.item(i).dol5;
+        Tickets += '&' + x.rows.item(i).dol6;
+        Tickets += '&' + x.rows.item(i).dol7;
+        Tickets += '&' + x.rows.item(i).dol8;
+        Tickets += '&' + x.rows.item(i).taxOn;
+        Tickets += '&' + x.rows.item(i).subT;
+        Tickets += '&' + x.rows.item(i).tax;
+        Tickets += '&' + x.rows.item(i).total;
+        Tickets += '&' + x.rows.item(i).newDate;
+        Tickets += '&' + x.rows.item(i).ticNum;
+        Tickets += '&' + x.rows.item(i).custInfo + '|';
+    }
+    allData += '^Tickets::' + escape(Tickets);
+    //goNote('Finished loading "allData"');
+    makeFile(allData);
+}
+
+function stat(s)
+{
+    statusSpan.innerHTML = s;
+}
+
+function pageLoad()
+{   
+    noGray();
+    db = parent.highFrame.db;
+    if ((!db) || (db.version.length == 0))
+    {
+       top.location.href = 'home.htm';
+        return;
+    }
+    grayDiv.style.top = '-666px';
+    noteTable.style.top = '-300px';
+    backUpTbl.style.top = '-1040px';
+    curs();
+    zoomWindow();
+    dbCopy = getS('dbCopy');
+    if (dbCopy == 'true')
+    {
+        setS('dbCopy','false');
+        goGray(backUpTbl);
+        getExtrasA();
+    }
+}
+
+function cleanup()
+{
+    db.transaction(function(tx)
+    {
+        tx.executeSql("DELETE FROM sales WHERE iKey > 0")
+        tx.executeSql("DELETE FROM tickets WHERE jKey > 0")
+        tx.executeSql("DELETE FROM computers WHERE cKey > 0")
+        tx.executeSql("DELETE FROM people WHERE pKey > 0")
+    })
+}
+
+function noGray()
+{
+    grayDiv.style.display = 'none';
+    noteTable.style.display = 'none';
+    backUpTbl.style.display = 'none';
+}
+
+function goGray(x)
+{
+    noGray();
+    grayDiv.style.display = '';
+    x.style.display = '';
+    popBox = x.id;
+}
+
+function zoomWindow()
+{
+    var Zoom;
+    var w = document.documentElement.clientWidth / 923;
+    var h = document.documentElement.clientHeight / 295;
+    if (w < h)
+        Zoom = w;
+    else
+        Zoom = h;
+    document.body.style.zoom = Math.min(1,Math.max(0.57,Zoom));
+    scroll(0,0);
+}
+
+// ]]>
+  </script>
+
+  <style type="text/css">
+    #grayDiv
+    {
+      filter: alpha(opacity=50);
+      -moz-opacity: .50;
+      opacity: .50;
+      background-color: #E0E0E0;
+      height: 450px;
+      width: 100%;
+      position: relative;
+      z-index: 100;
+    }
+    #noteTable
+    {
+      position: absolute;
+      left: 50%;
+      margin-left: -270px;
+      z-index: 200;
+    }
+    #backUpTbl
+    {
+      position: relative;
+      z-index: 110;
+    }
+    #CityTxt
+    {
+      width: 256px;
+      font-size: 18px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .mBtns
+    {
+      font-size: 18px;
+      height: 40px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      width: 168px;
+    }
+    .mBtnClass
+    {
+      align: center;
+      style: height: 57px;
+      width: 200px;
+      height: 55px;
+      valign: middle;
+    }
+    .th
+    {
+      width: 100%;
+      height: 100%;
+      border: 1px solid #DDFFDD;
+    }
+    textarea
+    {
+      overflow: auto;
+      font-family: Verdana;
+      font-size: 18px;
+      color: #6A0000;
+      width: 341px;
+      height: 103px;
+    }
+    #btnTxt
+    {
+      width: 365px;
+      text-align: center;
+    }
+    #thanksDiv
+    {
+      height: 680px;
+    }
+    .name
+    {
+      font-family: Verdana;
+      font-size: 18px;
+      color: #6A0000;
+      width: 156px;
+    }
+    .store
+    {
+      font-family: Verdana;
+      font-size: 18px;
+      color: #6A0000;
+      width: 230px;
+    }
+    .pass
+    {
+      font-family: Verdana;
+      font-size: 18px;
+      color: #6A0000;
+      width: 253px;
+    }
+    .cBox
+    {
+      width: 19px;
+      height: 17px;
+    }
+    .addrText
+    {
+      width: 256px;
+      font-family: Verdana;
+      font-size: 18px;
+    }
+    #ownerTxt
+    {
+      width: 53px;
+      font-size: 18px;
+      font-family: Verdana;
+      text-align: center;
+    }
+    #employeeTxt
+    {
+      width: 53px;
+      font-size: 18px;
+      font-family: Verdana;
+      text-align: center;
+    }
+    #weeklyTxt
+    {
+      font-family: Verdana;
+      font-size: 18px;
+      width: 71px;
+      text-align: center;
+    }
+    #stateeTxt
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      width: 162px;
+    }
+    #zipTxt
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      width: 80px;
+    }
+    #Select1
+    {
+      width: 220px;
+      text-align: center;
+    }
+    #storeStateTxt
+    {
+      width: 35px;
+      font-size: 18px;
+      font-family: Verdana;
+    }
+    #storeZipTxt
+    {
+      width: 65px;
+      font-size: 18px;
+      font-family: Verdana;
+    }
+    #clearTicketBtn
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      height: 33px;
+      width: 100px;
+    }
+    #deleteTechBtn
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+      height: 33px;
+      width: 100px;
+    }
+    #nextInfoBtn
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 16px;
+    }
+    #leftBtn
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 24px;
+    }
+    #detailOkBtn
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 24px;
+    }
+    #rightBtn
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 24px;
+      margin-left: 53px;
+    }
+    #techDetailBtn
+    {
+      height: 31px;
+      width: 168px;
+    }
+    #taxRateTxt
+    {
+      height: 28px;
+      width: 83px;
+      font-family: Verdana;
+      font-size: 18px;
+    }
+    #Button1
+    {
+      width: 192px;
+    }
+    #backBtn
+    {
+      width: 192px;
+    }
+    #Button2
+    {
+      width: 150px;
+    }
+    #Button3
+    {
+      width: 150px;
+    }
+    #forwardBtn
+    {
+      width: 150px;
+    }
+    #Button4
+    {
+      width: 150px;
+    }
+    @font-face
+    {
+      font-family: NarrowFamily;
+      src: url(   'js/Arial Narrow.ttf' );
+    }
+    #exitBtn
+    {
+      width: 75px;
+    }
+    .otherBtnClass
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body bgcolor="#e0e0e0" style="text-align: center; font-family: NarrowFamily;" onload="pageLoad()"
+  onresize="return zoomWindow()">
+  <form name="form1" method="post" action="rBkOffice.htm" id="form1">
+  <table id="mainTable" align="center" cellpadding="0" cellspacing="0">
+    <tr>
+      <td style="height: 400px; font-size: 1px" align="center" valign="top">
+        <div align="center" style="border: 2px solid #000000; text-align: center; background-image: url('images/bg3p.png');
+          width: 913px;">
+          <table align="center" cellpadding="0" cellspacing="0" style="width: 100%; height: 269px;">
+            <tr>
+              <td valign="top" style="height: 101px">
+                <table cellpadding="0" cellspacing="0" style="width: 100%;" align="center">
+                  <tr>
+                    <td style="width: 25px" valign="top">
+                      <div onclick="About()" id="LT" style="position: relative; top: -6px; left: -6px;
+                        font-size: 1px;">
+                        <img alt="" src="images/LT.gif" />
+                      </div>
+                    </td>
+                    <td>
+                      &nbsp;
+                    </td>
+                    <td style="width: 25px" valign="top">
+                      <div id="RT" style="position: relative; top: -6px; left: 6px; font-size: 1px;">
+                        <img alt="" src="images/RT.gif" />
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+                <table cellpadding="0" cellspacing="0" style="width: 100%; background-color: #666666;">
+                  <tr>
+                    <td align="center" style="width: 109px">
+                      &nbsp;
+                    </td>
+                    <td style="text-align: center; font-family: 'Times New Roman', Times, serif; font-size: 48px;
+                      color: #DDFFDD;">
+                      Database Manager
+                    </td>
+                    <td align="center" style="width: 128px">
+                      &nbsp;
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td valign="bottom" align="center" width="100%" height="100%">
+                <table id="inOutTbl" cellpadding="0" cellspacing="0" style="width: 100%;" align="center">
+                  <tr>
+                    <td style="text-align: center; width: 446px;" align="center" valign="top">
+                      <span style="font-family: Arial, Helvetica, sans-serif; font-size: 24px">&nbsp;<b>BACKUP<br />
+                      </b>(Database To Files)<br />
+                      </span>
+                      <br style="font-family: Arial, Helvetica, sans-serif; font-size: 12px" />
+                      <input id="backBtn" type="button" value="Backup Database" onclick="getExtrasA()"
+                        style="font-family: Arial, Helvetica, sans-serif; font-size: 20px" /><br />
+                    </td>
+                    <td style="text-align: center; width: 5px; background-color: #000000;" align="center"
+                      valign="top">
+                      &nbsp;
+                    </td>
+                    <td style="text-align: center;" align="center" valign="top">
+                      <span style="font-family: Arial, Helvetica, sans-serif; font-size: 24px">&nbsp;<b>RESTORE<br />
+                      </b>(Files To&nbsp; Database)<br />
+                      </span>
+                      <br style="font-family: Arial, Helvetica, sans-serif; font-size: 12px" />
+                      <input id="Button1" type="button" value="Restore Database" style="font-family: Arial, Helvetica, sans-serif;
+                        font-size: 20px" onclick="getFile()" />
+                      <input id="upFile" type="file" onchange="loadFile(this.files)" style="display: none">
+                    </td>
+                  </tr>
+                </table>
+                <table cellpadding="0" cellspacing="0" style="width: 100%">
+                  <tr>
+                    <td style="font-family: 'Times New Roman', Times, serif; font-size: 24px; height: 45px;
+                      text-align: center; color: #FFFFCC;">
+                      <span id="statusSpan"></span>
+                    </td>
+                  </tr>
+                </table>
+                <table cellpadding="0" cellspacing="0" style="width: 100%; height: 25px" align="center">
+                  <tr>
+                    <td style="width: 15%;" valign="bottom">
+                      <div id="LB" style="width: 20; position: relative; top: 6px; left: -6px; font-size: 1px;">
+                        <img alt="" src="images/LB.gif" />
+                      </div>
+                    </td>
+                    <td style="width: 70%; text-align: center;" valign="middle">
+                      &nbsp;
+                    </td>
+                    <td style="width: 15%;" valign="bottom" align="right">
+                      <div id="RB" style="width: 20; position: relative; top: 6px; left: 6px; font-size: 1px;">
+                        <img alt="" src="images/RB.gif" />
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 256px; text-align: center;" align="center">
+        <div align="center">
+          <table id="noteTable" cellpadding="2" style="border-left: 3px solid #000080; border-right: 3px solid #009999;
+            border-top: 3px solid #000080; border-bottom: 3px solid #009999; height: 252px;
+            width: 540px;" bgcolor="white" align="center">
+            <tr>
+              <td align="center">
+                <table style="border-color: #000000; width: 526px;" cellpadding="0" cellspacing="0"
+                  border="1" align="center">
+                  <tr>
+                    <td id="noteTd" bgcolor="#009900" style="height: 179px;">
+                      <table cellpadding="0" cellspacing="0" style="width: 100%; height: 100%;">
+                        <tr>
+                          <td style="text-align: center">
+                            <span id="NoteMsg" style="color: #DDFFDD; font-size: 22px; font-family: Arial; text-align: center;">
+                              No message.</span>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center">
+                      <table cellpadding="0" cellspacing="0" background="images/pinkCarpet.jpg" style="width: 100%;
+                        height: 54px;" align="center">
+                        <tr>
+                          <td align="center">
+                            <div id="BnDiv1">
+                              <input id="NoteBtn1" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                                font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                                color: #FFFFFF; height: 50px;" type="button" value="one" onclick="return NoteClick(this.value)" />
+                            </div>
+                          </td>
+                          <td align="center">
+                            <div id="BnDiv2">
+                              <input id="NoteBtn2" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                                font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                                color: #FFFFFF; height: 50px;" type="button" value="two" onclick="return NoteClick(this.value)" />
+                            </div>
+                          </td>
+                          <td align="center">
+                            <div id="BnDiv3">
+                              <input id="NoteBtn3" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                                font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                                color: #FFFFFF; height: 50px;" type="button" value="three" onclick="return NoteClick(this.value)" />
+                            </div>
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td valign="bottom" style="font-size: 1px; height: 460px">
+        <div id="grayDiv">
+          &nbsp;
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td valign="bottom" style="font-size: 1px; height: 195px">
+        <table id="backUpTbl" align="center" style="background-image: url('images/silverPgBk.png');">
+          <tr>
+            <td>
+              <div style="border: thin solid #000000">
+                <table align="center" cellspacing="5" style="height: 184px; font-family: Arial, Helvetica, sans-serif;
+                  font-size: 20px; font-weight: 700; width: 514px;" border="0" cellpadding="0">
+                  <tr>
+                    <td align="center" style="height: 50px; font-size: 36px;" valign="middle">
+                      Backing Up Your Database
+                    </td>
+                  </tr>
+                  <tr>
+                    <td style="font-size: 24px; text-align: right; height: 37px;" valign="middle">
+                      <table cellpadding="0" cellspacing="5" style="width: 100%; height: 50px;">
+                        <tr>
+                          <td style="font-size: 24px; text-align: right; width: 312px">
+                            Please Wait....
+                          </td>
+                          <td align="left">
+                            <img alt="" src="images/processing3.gif" style="width: 32px; height: 32px" />
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="height: 62px;" valign="middle">
+                      <input class="otherBtnClass" type="button" value="Cancel" onclick="location.href='mForm.htm'" />
+                    </td>
+                  </tr>
+                </table>
+              </div>
+            </td>
+          </tr>
+        </table>
+      </td>
+    </tr>
+  </table>
+  <span id="colorSpan"></span>
+  <input id="dummyBtn" type="button" text="Button" postbackurl="dummy.txt" style="display: none" />
+  </form>
+  <br />
+</body>
+</html>

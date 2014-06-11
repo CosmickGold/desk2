@@ -1,0 +1,121 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+  <title>Prepare Database</title>
+
+  <script language="javascript" type="text/javascript">    
+// <!CDATA[
+        window.onerror = function(msg,url,line)
+        {
+            alert('******* AN ERROR HAS OCCURRED *******' +
+              '\n\n' +
+              '\nText:' + msg + '\nurl:' + url + '\nline:' + line);
+        }
+// ]]>
+  </script>
+
+  <script type="text/javascript" src="js/shared35.js"></script>
+
+  <script language="javascript" type="text/javascript">
+<!--
+
+var db,ar,arNum;
+
+function createTable2(tx)
+{
+  note('extras1');
+  tx.executeSql
+  (
+    "CREATE TABLE extras (eKey text, data text)",[],
+    initTicNum,
+    function(tx,ex) { onError('createTable2',ex) }
+  )
+}
+
+function initTicNum(tx)
+{
+  note('initTicNum');
+  tx.executeSql("INSERT INTO extras (eKey, data) VALUES ('ticNum','1000')",[],
+    function(tx,result)
+    {
+      //setS('newBase','true');
+      initDates(tx)
+    },
+    function(tx,ex) { onError('initTicNum',ex) }
+  )
+}
+
+function initDates(tx)
+{
+  note('initTicNum');
+  tx.executeSql("INSERT INTO extras (eKey, data) VALUES ('eDates','000000')",[],
+    function(tx,result)
+    {
+      //setS('newBase','true');
+      location.href = 'mForm.htm';
+    },
+    function(tx,ex) { onError('initDates',ex) }
+  )
+}
+
+function pageLoad()
+{
+    //window.applicationCache.addEventListener('error',logEvent);
+    if (parent.highFrame.defaults != 'try')
+    {
+        location.href = 'base.htm';
+        return;
+    }
+    db = parent.highFrame.db;
+    note('Create: tickets');
+    db.transaction(function(tx)
+    {
+      tx.executeSql
+      (
+          "CREATE TABLE tickets" +
+              " (fName text, LName text, cPhone text, hPhone text, make text, model text, pass text, adapter text, other text, prepaid text, " +
+              "problems text, sol1 text, sol2 text, sol3 text, sol4 text, sol5 text, sol6 text, sol7 text, sol8 text, " +
+              "radio text, dol1 text, dol2 text, dol3 text, dol4 text, dol5 text, dol6 text, dol7 text, dol8 text, taxOn text, " +
+              "subT text, tax text, total text, newDate text, ticNum text, custInfo)",[],
+          createTable2,
+          function(tx,ex) { onError('pageLoad',ex) }
+      )
+    })
+}
+
+function note(s) { dbSpan.innerText += s + '\r\n'; }
+
+// -->
+  </script>
+
+  <style type="text/css">
+    #loadingDiv
+    {
+      text-align: center;
+    }
+  </style>
+</head>
+<body onload="pageLoad()">
+  <p>
+    &nbsp;</p>
+  <table cellpadding="0" cellspacing="0" style="background-image: url('images/topBar2.png');
+    width: 393px" align="center">
+    <tr>
+      <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 36px">
+        <b><span style="color: #009933">Desk2</span>.com </b>
+      </td>
+    </tr>
+  </table>
+  <p>
+    &nbsp;</p>
+  <div id="loadingDiv">
+    <img alt="" src="images/processing3.gif" style="width: 32px; height: 32px" /><span
+      style="font-family: 'Comic Sans MS'; font-size: 25px; text-align: center;">&nbsp;&nbsp;
+      Loading Database . . . . </span>
+    <br />
+    <br />
+    <span style="font-family: Arial, Helvetica, sans-serif; font-size: 18px"><span id="dbSpan">
+    </span></span>
+  </div>
+</body>
+</html>

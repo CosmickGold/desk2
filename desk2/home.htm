@@ -1,0 +1,148 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="en-us" http-equiv="Content-Language" />
+  <title>Desk2: Select</title>
+  <style type="text/css">
+    #Button1
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      width: 100px;
+    }
+    #Button2
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      width: 100px;
+    }
+    #Button3
+    {
+      width: 100px;
+      height: 33px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 14pt;
+    }
+  </style>
+
+  <script language="javascript" type="text/javascript">
+<!--
+
+function Button1_onclick()
+{
+  var win = window.open('base.htm','BASE');
+  win.focus();
+}
+
+function Button2_onclick()
+{
+  var win = window.open('remote.htm','REMOTE');
+  win.focus();
+}
+
+function Button3_onclick()
+{
+  var win = window.open('help.htm','HELP');
+  win.focus();
+}
+
+// -->
+  </script>
+
+</head>
+<body style="text-align: center" bgcolor="#ffffcc">
+  <span style="font-size: 48px; font-family: Arial, Helvetica, sans-serif">Desk2.org
+    <br />
+    <br />
+  </span>
+  <table cellpadding="0" cellspacing="0" style="width: 718px" align="center" border="0">
+    <tr>
+      <td colspan="2" style="text-align: center; font-size: 18px; font-family: Arial, Helvetica, sans-serif;">
+        <span style="font-family: Arial, Helvetica, sans-serif; font-size: 18px">This program
+          processes conmputer-repair forms that are:<br />
+          &nbsp;</span>
+      </td>
+    </tr>
+    <tr>
+      <td style="font-family: Arial, Helvetica, sans-serif; font-size: 18px; width: 140px">
+        &nbsp;
+      </td>
+      <td style="font-family: Arial, Helvetica, sans-serif; font-size: 18px; text-align: left;">
+        1.&nbsp; Given to the customer as their claim check,<br />
+        2.&nbsp; Used by technicians to document the repair process,<br />
+        3.&nbsp; Auto-calculate the full price of repairs, including tax,<br />
+        4.&nbsp; Civen to the customer as their warranty.<br />
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; 
+        ------<br />
+        5.&nbsp; Stored in a searchable database on your local computer.<br />
+        6.&nbsp; Auto-backed up in a download once each day.<br />
+        7.&nbsp; Fully functional even when off the internet.<br />
+        8.&nbsp; Available for remote read / write through the internet.</td>
+    </tr>
+  </table>
+  <p>
+    <br />
+  </p>
+  <table cellpadding="0" cellspacing="0" align="center">
+    <tr>
+      <td style="text-align: right">
+        <input id="Button1" type="button" value="BASE" onclick="return Button1_onclick()"
+          onmouseover="style.cursor = 'pointer'" />
+      </td>
+      <td style="width: 25px">
+        &nbsp;
+      </td>
+      <td style="font-family: 'Times New Roman', Times, serif; font-size: 18px; text-align: left;"
+        onclick="return Button1_onclick()" onmouseover="style.cursor = 'pointer'">
+        Click here to open the database located on this computer.
+      /td>
+    </tr>
+    <tr>
+      <td style="height: 54px">
+      </td>
+      <td style="height: 54px; width: 25px;">
+      </td>
+      <td style="height: 54px">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right">
+        <input id="Button2" type="button" value="Remote" onclick="return Button2_onclick()"
+          onmouseover="style.cursor = 'pointer'" />
+      </td>
+      <td style="width: 25px">
+        &nbsp;
+      </td>
+      <td style="font-family: 'Times New Roman', Times, serif; font-size: 18px; text-align: left;"
+        onclick="return Button2_onclick()" onmouseover="style.cursor = 'pointer'">
+        Click here to open the database located on another computer.
+      </td>
+    </tr>
+    <tr>
+      <td style="height: 54px">
+      </td>
+      <td style="height: 54px; width: 25px;">
+      </td>
+      <td style="height: 54px">
+      </td>
+    </tr>
+    <tr>
+      <td style="text-align: right">
+        <input id="Button3" type="button" value="Help" onclick="return Button3_onclick()"
+          onmouseover="style.cursor = 'pointer'" />
+      </td>
+      <td style="width: 25px">
+        &nbsp;
+      </td>
+      <td style="font-family: 'Times New Roman', Times, serif; font-size: 18px; text-align: left;"
+        onclick="return Button2_onclick()" onmouseover="style.cursor = 'pointer'">
+        Click here for instructions on any part of the form.
+      </td>
+    </tr>
+  </table>
+  <br />
+<p>
+  Contact:  Tom@Desk2.org</p>
+</body>
+</html>

@@ -1,0 +1,1525 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+  <meta content="text/html; charset=utf-8" http-equiv="Content-Type" />
+  <meta content="en-us" http-equiv="Content-Language" />
+  <title>webRTC Chat</title>
+  <style>
+    #grayDiv
+    {
+      filter: alpha(opacity=50);
+      -moz-opacity: .50;
+      opacity: .50;
+      background-color: #888888;
+      top: -1230px;
+      height: 1250px;
+      width: 100%;
+      position: relative;
+      z-index: 100;
+    }
+    #noteTable
+    {
+      position: absolute;
+      left: 50%;
+      margin-left: -270px;
+      z-index: 200;
+    }
+    #blueTop
+    {
+      font-weight: 600;
+      font-size: 18px;
+      background-color: #4dace2;
+      border: 1px solid #0C6BA1;
+      max-width: 600px;
+      width: 900px;
+    }
+    .warning
+    {
+      max-width: 600px;
+      padding: 20px;
+      background-color: #eee;
+      border: 1px solid #ccc;
+      font-size: 18px;
+    }
+    .browserinfo
+    {
+      padding: 20px;
+      border: 1px solid #ccc;
+      background-color: #f8f8f8;
+    }
+    a
+    {
+      font-weight: 600;
+    }
+    .txt
+    {
+      height: 38px;
+      width: 234px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+    }
+    .lab
+    {
+      text-align: right;
+      font-family: Arial, Helvetica, sans-serif;
+      width: 235px;
+      font-size: 24px;
+    }
+    .dol
+    {
+      width: 71px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+      text-align: right;
+    }
+    #MyIdTxt
+    {
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+      text-align: center;
+    }
+    #MyIdBtn
+    {
+      font-size: 18px;
+      width: 150px;
+      height: 25px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    #PartnerIdBtn
+    {
+      font-size: 18px;
+      width: 178px;
+    }
+    #problemTxt
+    {
+      height: 230px;
+      width: 410px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 18px;
+    }
+    .sol
+    {
+      width: 564px;
+      height: 36px;
+      font-size: 18px;
+      font-family: "Times New Roman" , Times, serif;
+    }
+    #notesTxt
+    {
+      width: 560px;
+      height: 126px;
+      text-align: center;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+    }
+    #newDateTxt
+    {
+      width: 104px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+      text-align: center;
+    }
+    #ticNumTxt
+    {
+      width: 87px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 20px;
+      text-align: center;
+    }
+    #custInfoTxt
+    {
+      height: 77px;
+      width: 410px;
+      font-family: "Times New Roman" , Times, serif;
+      font-size: 18px;
+    }
+    #Button1
+    {
+      height: 18px;
+    }
+    #hideShowBtn
+    {
+      height: 25px;
+      width: 150px;
+      font-family: Arial, Helvetica, sans-serif;
+      font-size: 18px;
+    }
+  </style>
+</head>
+<body bgcolor="#e0e0e0" onload="pageLoad()">
+  <div id="main" align="center">
+
+    <script type="text/javascript" src="js/note5.js"></script>
+
+    <script type="text/javascript" src="js/jquery.min.js"></script>
+
+    <script type="text/javascript" src="js/peer.js"></script>
+
+    <script language="javascript" type="text/javascript">    
+// <!CDATA[
+        window.onerror = function(msg,url,line)
+        {
+      {
+          goNote('*** ERROR ***\n' + msg + '\n\nurl: ' + url + '\nline: ' + line);
+      }
+        }
+// ]]>
+    </script>
+
+    <script type="text/javascript" src="js/shared35.js"></script>
+
+    <script type="text/javascript" src="js/phone2.js"></script>
+
+    <script>
+
+var txtBlur = false, reconnecting = false, phoneID = '';
+var peer1,peer2,db,keyPresses,arr,picArr,picArrCnt,lastMsg;
+
+
+function pageLoad()
+{
+  top = '-1480px';
+  grayDiv.style.display = 'none';
+  noteTable.style.top = '100px';
+  db = parent.highFrame.db;
+  document.onkeypress = getDocKey;
+  ticNumTxt.value = '(New)';
+  window.onblur = mightSave;
+  window.onkeypress = plusPress;
+  picFile.addEventListener('change', handleFileSelect, false);
+  cPhoneTxt.focus();
+  if (localStorage.myPic)
+    topPic.src = localStorage.myPic;
+  checkBackup();
+  notesTxt.value = localStorage.notes;
+  for (var i=1; i<9; i++) theKid(i);
+}
+
+function checkBackup()
+{
+    db.transaction(function(tx)
+    {
+        tx.executeSql
+        (
+            "SELECT data FROM extras WHERE (eKey = 'eDates')",[],
+            checkBackupB,
+            function(tx,ex) { onError('getExtrasA',ex) }
+        )
+    })
+}
+
+function checkBackupB(tx,result)
+{
+    var eDate = result.rows.item(0).data;
+    var date = now6();
+    if (eDate == date)
+        return;
+    tx.executeSql
+    (
+        "UPDATE extras SET data = ? WHERE (eKey = 'eDates')",
+        [date],
+        checkBackupC,
+        function(tx,ex) { onError('saveCompNote',ex) }
+    );
+}
+
+function checkBackupC()
+{
+    setS('dbCopy','true');
+    location.href = 'database.htm';
+}
+
+function handleFileSelect(evt)
+{
+  var pic = evt.target.files[0];
+  if (!pic.type.match('image.*'))
+  {
+    goNote('Not an image file.');
+    return;
+  }
+  var reader = new FileReader();
+  reader.onload = (function(theFile)
+  {
+    return function(e)
+    {
+      localStorage.myPic = e.target.result;
+      topPic.src = localStorage.myPic;
+    };
+  })
+  (pic);
+  reader.readAsDataURL(pic);
+}
+
+function mightSave()
+{
+  if (txtBlur)
+    saveTicket()
+}
+
+function plusPress() { keyPresses++; }
+
+function makeTicNum()
+{
+  db.transaction(function(tx)
+  {
+    tx.executeSql
+    (
+      "SELECT data FROM extras WHERE (eKey = 'ticNum')",[],
+      checkBackupB,
+      function(tx,ex) { onError('makeTicNum',ex) }
+    )
+  })
+}
+
+function updateForm()
+{
+  db.transaction(function(tx)
+  {
+    tx.executeSql(
+      "UPDATE tickets SET fName=?, LName=?, cPhone=?, hPhone=?, make=?, model=?, pass=?, adapter=?, other=?, prepaid=?, problems=?, " +
+        "sol1=?, sol2=?, sol3=?, sol4=?, sol5=?, sol6=?, sol7=?, sol8=?, radio=?, dol1=?, dol2=?, dol3=?, dol4=?, dol5=?, dol6=?, dol7=?, dol8=?, taxOn=?, " +
+        "subT=?, tax=?, total=?, custInfo=? WHERE (ticNum = " + ticNumTxt.value + ")",
+      [goUpper(fNameTxt.value),goUpper(LNameTxt.value),cPhoneTxt.value,hPhoneTxt.value,makeTxt.value,modelTxt.value,
+        passTxt.value,adapterTxt.value,itemsTxt.value,prePaidTxt1.value,problemTxt.value,whatTxt1.value,whatTxt2.value,
+        whatTxt3.value,whatTxt4.value,whatTxt5.value,whatTxt6.value,whatTxt7.value,whatTxt8.value,getChecks(),
+        priceTxt1.value,priceTxt2.value,priceTxt3.value,priceTxt4.value,priceTxt5.value,priceTxt6.value,priceTxt7.value,
+        priceTxt8.value,fullAmt.innerText,subTotTxt.value,taxTxt.value,totalTxt.value,custInfoTxt.value],
+      null,
+      function(tx,ex) { onError('updateForm',ex) }
+    );
+  })
+}
+
+function sUpdateForm(arr)
+{
+  if (arr[1] == '(New)')
+    newRemoteTicket(arr)
+  else
+    saveUpdate(arr);
+}
+
+function saveUpdate(arr)
+{
+  db.transaction(function(tx)
+  {
+    tx.executeSql(
+      "UPDATE tickets SET fName=?, LName=?, cPhone=?, hPhone=?, make=?, model=?, pass=?, adapter=?, other=?, prepaid=?, problems=?, " +
+        "sol1=?, sol2=?, sol3=?, sol4=?, sol5=?, sol6=?, sol7=?, sol8=?, radio=?, dol1=?, dol2=?, dol3=?, dol4=?, dol5=?, dol6=?, dol7=?, dol8=?, taxOn=?, " +
+        "subT=?, tax=?, total=?, custInfo=? WHERE (ticNum = " + arr[1] + ")",
+      [arr[2],arr[3],arr[4],arr[5],arr[6],arr[7],arr[8],arr[9],arr[10],arr[11],arr[12],
+      arr[13],arr[14],arr[15],arr[16],arr[17],arr[18],arr[19],arr[20],arr[21],arr[22],arr[23],
+      arr[24],arr[25],arr[26],arr[27],arr[28],arr[29],arr[30],arr[31],arr[32],arr[33],arr[34]],
+      null,
+      function(tx,ex) { onError('saveUpdate',ex) }
+    );
+  })
+}
+
+function newRemoteTicket(arr)
+{
+  db.transaction(function(tx)
+  {
+    tx.executeSql
+    (
+      "SELECT data FROM extras WHERE (eKey = 'ticNum')",[],
+      function(tx,result) { newRemoteTicketB(tx,result,arr) },
+      function(tx,ex) { onError('newRemoteTicket',ex) }
+    )
+  })
+}
+
+function newRemoteTicketB(tx,result,arr)
+{
+  arr[1] = (ParseInt(result.rows.item(0).data) + 1).toString();
+  tx.executeSql
+  (
+    "UPDATE extras SET data = '" + arr[1] + "' WHERE (eKey = 'ticNum')",[],
+    function(tx,result) { newRemoteTicketC(tx,result,arr) },
+    function(tx,ex) { onError('newRemoteTicketB',ex) }
+  );
+}
+
+function newRemoteTicketC(tx,result,arr)
+{
+  sDate = today();
+  tx.executeSql
+  (
+    "INSERT INTO tickets (fName, LName, cPhone, hPhone, make, model, pass, adapter, other, " +
+    "prepaid, problems, sol1, sol2, sol3, sol4, sol5, sol6, sol7, sol8, radio, dol1, dol2, " +
+    "dol3, dol4, dol5, dol6, dol7, dol8, taxOn, subT, tax, total, newDate, ticNum, custInfo)"+
+    " VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+    [arr[2],arr[3],arr[4],arr[5],arr[6],arr[7],arr[8],arr[9],arr[10],arr[11],arr[12],arr[13],
+    arr[14],arr[15],arr[16],arr[17],arr[18],arr[19],arr[20],arr[21],arr[22],arr[23],arr[24],
+    arr[25],arr[26],arr[27],arr[28],arr[29],arr[30],arr[31],arr[32],arr[33],sDate,arr[1],arr[34]],
+    function(tx,ex) { sendRemote('setDatNTic',sDate+'^'+arr[1]) },
+    function(tx,ex) { onError('newRemoteTicketC',ex) }
+  );
+}
+
+function saveTicket()
+{
+  if (ticNumTxt.value == '(New)')
+    db.transaction(function(tx)
+    {
+      tx.executeSql
+      (
+        "SELECT data FROM extras WHERE (eKey = 'ticNum')",[],
+        saveTicketB,
+        function(tx,ex) { onError('saveTicket',ex) }
+      )
+    })
+  else
+    updateForm()
+}
+
+function saveTicketB(tx,result)
+{
+  ticNumTxt.value = (ParseInt(result.rows.item(0).data) + 1).toString();
+  tx.executeSql
+  (
+    "UPDATE extras SET data = '" + ticNumTxt.value + "' WHERE (eKey = 'ticNum')",[],
+    saveTicketC,
+    function(tx,ex) { onError('saveTicketB',ex) }
+  );
+}
+
+function saveTicketC()
+{
+    newDateTxt.value = today();
+    db.transaction(function(tx)
+    {
+      tx.executeSql
+      (
+        "INSERT INTO tickets (fName, LName, cPhone, hPhone, make, model, pass, adapter, other, prepaid, problems, " +
+        "sol1, sol2, sol3, sol4, sol5, sol6, sol7, sol8, radio, dol1, dol2, dol3, dol4, dol5, dol6, dol7, dol8, taxOn, " +
+          "subT, tax, total, newDate, ticNum, custInfo) VALUES " +
+        "(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)",
+        [goUpper(fNameTxt.value),goUpper(LNameTxt.value),cPhoneTxt.value,hPhoneTxt.value,makeTxt.value,modelTxt.value,
+        passTxt.value,adapterTxt.value,itemsTxt.value,prePaidTxt1.value,problemTxt.value,whatTxt1.value,whatTxt2.value,
+        whatTxt3.value,whatTxt4.value,whatTxt5.value,whatTxt6.value,whatTxt7.value,whatTxt8.value,getChecks(),
+        priceTxt1.value,priceTxt2.value,priceTxt3.value,priceTxt4.value,priceTxt5.value,priceTxt6.value,priceTxt7.value,
+        priceTxt8.value,fullAmt.innerText,subTotTxt.value,taxTxt.value,totalTxt.value,newDateTxt.value,ticNumTxt.value,
+        custInfoTxt.value],
+        null,
+        function(tx,ex) { onError('saveTicketC',ex) }
+      );
+    })
+}
+
+function loadForm(tx,result)
+{
+  if (result.rows.length == 0)
+  {
+    var s = parent.highFrame.findTxt.value;
+    if (s == '<')
+      goNote('START of Tickets');
+    else if (s == '>')
+      goNote('END of Tickets');
+    else
+      goNote('"' +s+
+        '" was not found as a '+parent.highFrame.fByTxt.innerText+ '.');
+    return;
+  }
+  var row = result.rows.item(0);
+  sendRemote('getTicket',objToStr(row));
+  ticNumTxt.value = row.ticNum;
+  newDateTxt.value = row.newDate; 
+  fNameTxt.value = row.fName;
+  LNameTxt.value = row.LName;
+  cPhoneTxt.value = row.cPhone;
+  hPhoneTxt.value = row.hPhone;
+  makeTxt.value = row.make;
+  modelTxt.value = row.model;
+  passTxt.value = row.pass;
+  adapterTxt.value = row.adapter;
+  itemsTxt.value = row.other;
+  prePaidTxt1.value = row.prepaid;
+  prePaidTxt2.value = row.prepaid;
+  var s = parseFloat(prePaidTxt2.value);
+  if ((s != 0) && (!isNaN(s)))
+    taxSpan.style.display = 'inline';
+  else
+    taxSpan.style.display = 'none';
+  problemTxt.value = row.problems;
+  whatTxt1.value = row.sol1;
+  whatTxt2.value = row.sol2;
+  whatTxt3.value = row.sol3;
+  whatTxt4.value = row.sol4;
+  whatTxt5.value = row.sol5;
+  whatTxt6.value = row.sol6;
+  whatTxt7.value = row.sol7;
+  whatTxt8.value = row.sol8;
+  setChecks(row.radio);
+  priceTxt1.value = row.dol1;
+  priceTxt2.value = row.dol2;
+  priceTxt3.value = row.dol3;
+  priceTxt4.value = row.dol4;
+  priceTxt5.value = row.dol5;
+  priceTxt6.value = row.dol6;
+  priceTxt7.value = row.dol7;
+  priceTxt8.value = row.dol8;
+  fullAmt.innerText = row.taxOn;
+  subTotTxt.value = row.subT;
+  taxTxt.value = row.tax;
+  totalTxt.value = row.total;
+  custInfoTxt.value = row.custInfo;
+}
+
+function copyTicket()
+{
+  keyPresses = 0;
+  ticNumTxt.value = '(New)';
+  newDateTxt.value = '';
+  makeTxt.value = '';
+  modelTxt.value = '';
+  passTxt.value = '';
+  adapterTxt.value = '';
+  itemsTxt.value = '';
+  prePaidTxt1.value = '';
+  prePaidTxt2.value = '';
+  taxSpan.style.display = 'none';
+  problemTxt.value = '';
+  whatTxt1.value = '';
+  whatTxt2.value = '';
+  whatTxt3.value = '';
+  whatTxt4.value = '';
+  whatTxt5.value = '';
+  whatTxt6.value = '';
+  whatTxt7.value = '';
+  whatTxt8.value = '';
+  for (var i=1; i<9; i++)
+  {
+    document.getElementById('ask'+i).checked = true;
+    document.getElementById('yes'+i).checked = false;
+    document.getElementById('no'+i).checked = false;
+    document.getElementById('cBox'+i).checked = false;
+    theKid(i);
+  }
+  priceTxt1.value = '';
+  priceTxt2.value = '';
+  priceTxt3.value = '';
+  priceTxt4.value = '';
+  priceTxt5.value = '';
+  priceTxt6.value = '';
+  priceTxt7.value = '';
+  priceTxt8.value = '';
+  fullAmt.innerText = '';
+  subTotTxt.value = '';
+  taxTxt.value = '';
+  totalTxt.value = '';
+  cPhoneTxt.focus();
+}
+
+function clearTicket()
+{
+  fNameTxt.value = '';
+  LNameTxt.value = '';
+  cPhoneTxt.value = '';
+  hPhoneTxt.value = '';
+  custInfoTxt.value = '';
+  copyTicket();
+}
+
+function getNameByPhoneA(phone)
+{
+    db.transaction(function(tx)
+    {
+        tx.executeSql  
+        (
+            "SELECT * FROM tickets WHERE ((cPhone=?) or (hPhone=?)) " +
+            "ORDER BY ticNum DESC LIMIT 1",[phone,phone],
+            getNameByPhoneB,
+            function(tx,ex) { onError('getNameByPhoneA2',ex) }
+        );
+    })
+}
+
+function getNameByPhoneB(tx,result)
+{
+  if (result.rows.length == 0)
+      return;
+  var row = result.rows.item(0);
+  fNameTxt.value = row.fName;
+  LNameTxt.value = row.LName;
+  cPhoneTxt.value = row.cPhone;
+  hPhoneTxt.value = row.hPhone;
+  makeTxt.value = row.make;
+  modelTxt.value = row.model;
+  passTxt.value = row.pass;
+  custInfoTxt.value = row.custInfo;
+}
+
+function setChecks(x)
+{
+  var a;
+  for (var i=1; i<9; i++)
+  {
+    a = x.substr(i-1,1);
+    document.getElementById('ask'+i).checked = (a == 0);
+    document.getElementById('yes'+i).checked = (a == 1);
+    document.getElementById('no'+i).checked = (a == 2);
+    document.getElementById('cBox'+i).checked = (x.substr(i+7,1) == 'T');
+    theKid(i);  
+  }
+}
+
+function getChecks()
+{
+  var a = '';
+  var b = '';
+  for (var i=1; i<9; i++)
+  {
+    if (document.getElementById('ask'+i).checked)
+      a += '0';
+    else if (document.getElementById('yes'+i).checked)
+      a += '1';
+    else if (document.getElementById('no'+i).checked)
+      a += '2';
+    if (document.getElementById('cBox'+i).checked)
+      b += 'T';
+    else
+      b += 'F';
+  }
+  return a + b;
+}
+
+function getTicket(col,SC)
+{
+  db.transaction(function(tx)
+  {
+    tx.executeSql
+    (
+      "SELECT * FROM tickets WHERE (" +col+ ") ORDER BY ticNum " +SC+ " LIMIT 1",[],
+        loadForm,
+      function(tx,ex) { onError('getTicket',ex) }
+    )
+  })
+}
+
+function sGetTicket(col,SC)
+{
+  db.transaction(function(tx)
+  {
+    tx.executeSql
+    (
+      "SELECT * FROM tickets WHERE (" +col+ ") ORDER BY ticNum " +SC+ " LIMIT 1",[],
+      function (tx,result)
+      {
+        if (result.rows.length == 0)
+          sendRemote('noRow','');
+        else
+        {
+          var row = result.rows.item(0);
+          sendRemote('getTicket',objToStr(row));
+        }
+      },
+      function(tx,ex) { onError('sGetTicket',ex) }
+    )
+  })
+}
+
+function getDocKey(c)
+{
+  if (c.keyCode != 13)
+    return;
+  var obj = window.event.srcElement;
+  if (obj.className == 'dol')
+    obj.blur();
+  else if (obj.localName == 'textarea')
+    return;
+  else if (obj == fNameTxt)
+    LNameTxt.focus()
+  else if (obj == LNameTxt)
+  {
+    if (cPhoneTxt.value == '')
+      cPhoneTxt.focus()
+    else
+      makeTxt.focus();
+  }
+  else if (obj == cPhoneTxt)
+    hPhoneTxt.focus()
+  else if (obj == hPhoneTxt)
+    makeTxt.focus()
+  else if (obj == makeTxt)
+    modelTxt.focus()
+  else if (obj == modelTxt)
+    passTxt.focus()
+  else if (obj == passTxt)
+    adapterTxt.focus()
+  else if (obj == adapterTxt)
+    itemsTxt.focus()
+  else if (obj == itemsTxt)
+    prePaidTxt1.focus()
+  else if (obj == prePaidTxt1)
+    prePaidTxt1.blur();
+}
+
+function showLog(n)
+{
+  if (n==0)
+  {
+    log2.style.display='none';
+    blueTop.style.display = 'none';
+  }
+  else
+  {
+    log2.style.display='table';
+    blueTop.style.display = 'table';
+  }
+}
+
+function gotPeer()
+{
+  // $('#blueNote2').append('Connected to Partner');
+  showLog(0);
+}
+
+function setPeer2Data()
+{
+  peer2.on('data', function(data)
+  {
+    arr = data.split('^');
+    switch (arr[0])
+    {
+      case 'getTicket': sGetTicket(arr[1],arr[2]); break;
+      case 'alert': goNote(arr[1]); break;
+      case 'updateForm': sUpdateForm(arr); break;
+      case 'getTopPic' : getTopPic(); break;
+      case 'getTopPicA' : getTopPicA(); break;
+    }
+  })
+}
+
+function getTopPic()
+{
+  if (!localStorage.myPic)
+    sendTo('alert^NO PICTURE SELECTED ON REMOTE DATABASE.');
+  else if (localStorage.myPic.length < 60000)
+    sendTo('getTopPic^'+localStorage.myPic);
+  else
+  {
+    picArr = localStorage.myPic.match(/.{1,50000}/g)
+    picArrCnt = 0;
+    sendTo('getTopPicA^'+picArr[0]);
+  }
+}
+
+function getTopPicA()
+{
+  picArrCnt++;
+  if (picArrCnt < (picArr.length-1))
+    sendTo('getTopPicA^'+picArr[picArrCnt]);
+  else
+    sendTo('getTopPic^'+picArr[picArrCnt]);
+}
+
+function breakNew(s)
+{
+  if (s == 'YES')
+  {
+    reconnecting = true;
+    if (!!peer2 && !peer2.destroyed && peer2.destroy)
+      peer1.destroy();
+  }
+}
+    
+function doConnect()
+{
+  peer1 = new Peer(String(MyIdTxt.value).toUpperCase(),{
+  key: 'jdwgvfk0xelmobt9',
+  debug: 3,
+  logFunction: function() {
+    var newMsg = Array.prototype.slice.call(arguments).join(' ');
+    var n = newMsg.indexOf('disconnected');
+    if (n != -1)
+      showLog(0);
+    if (newMsg != lastMsg)
+    {
+      $('.log').append(newMsg + '<br>');
+      if ((n + newMsg.indexOf('WARNING') + newMsg.indexOf('ERROR:')) > -3)
+        goNote(newMsg);
+      lastMsg = newMsg;
+    }
+  },
+  config: {'iceServers': [
+    { url: 'stun:stun.l.google.com:19302' }
+    ]} /* Sample servers, please use appropriate ones */
+  });
+  peer1.on('open', function(id){
+    goNote('Your database is now online,<br>with the name: "' +peer1.id+
+      '"<br>ready for a remote computer to connect.');
+  });
+  peer1.on('close', function() {
+    if (reconnecting)
+    {
+      reconnecting = false;
+      doConnect();
+    }
+  });
+  peer1.on('connection', function(connect) {
+    peer2 = connect;
+    peer2.on('open', function() {
+      gotPeer();
+  });
+  setPeer2Data();
+  });
+  $('#browsers').text(navigator.userAgent);    // Show browser version
+  window.onunload = window.onbeforeunload = function(e) {
+    if (!!peer1 && !peer1.destroyed && peer1.destroy) {
+      peer1.destroy(); }
+    if (!!peer2 && !peer2.destroyed && peer2.destroy) {
+      peer2.destroy(); }
+  };
+}
+
+function MyIdBtn_onclick() {
+  if (MyIdTxt.value == '')
+    goNote("First, enter a name for this database.")
+  else if (!navigator.onLine)
+    goNote('You must be online<br>to offer the database.');
+  else if (!!peer1 && !peer1.destroyed && peer1.destroy)
+    goNote('Break your current connection as:<br>"' +peer1.id+ '"','YES','','NO',breakNew);
+  else
+    doConnect();
+}
+
+function objToStr(obj)
+{
+  var arr = '';
+  Object.keys(obj).forEach
+  (
+    function (key)
+    {
+      arr += (obj[key].replace(/\^/g,'*') + '^');
+    }
+  );
+  return arr;
+}
+
+function sendTo(s)
+{
+  if (peer2)
+    peer2.send(s);
+  else
+    goNote('YOU ARE NOT CONNECTED TO THE REMOTE COMPUTER.');
+}
+
+function sendRemote(why,arr)
+{
+  if (!peer2)
+    return;
+  sendTo(why + '^' + arr);
+}
+
+function depo1Blur(obj)
+{
+  var s;
+  dolBlur(obj);
+  if ((obj.value.length == 0) || (obj.value == '0.00'))
+    s = '';
+  else
+    s = '-';
+  prePaidTxt2.value = s + obj.value;
+  totals();
+}
+
+function depo2Blur(obj)
+{
+  dolBlur(obj);
+  var s
+  prePaidTxt1.value = obj.value;
+  if ((obj.value.length != 0) && (obj.value != '0.00'))
+    obj.value = '-' + obj.value;
+  totals();
+}
+
+function dolBlur(obj)
+{
+  onBlur(obj);
+  dolKeyUp(obj);
+  var s = /*'-' +*/ obj.value.replace(/[^\d.]/g, '');
+  if (s != '')
+  {
+    var n = parseFloat(s,10).toFixed(2);
+    s = n.toString();
+    obj.value = s;
+  }
+  totals();
+}
+
+function dolKeyUp(obj)
+{
+  var s = obj.value;
+  if (s == '')
+    return;
+  s = /*'-' +*/ obj.value.replace(/[^\d.]/g, '');
+  if (s == '')
+    s = '0';
+  //var n = parseFloat(s,10).toFixed(2);
+  //s = n.toString();
+  obj.value = s;
+}
+
+function idNum(who) { return who.id.replace(/[^\d.]/g, '') }
+  
+function theKid(n)
+{
+  function b(me)
+  {
+    var o = obj(me);
+    if (o.checked)
+      o.parentElement.style.fontWeight = 700;
+    else
+      o.parentElement.style.fontWeight = '';
+  }
+  b('ask'+n);
+  b('no'+n);
+  b('yes'+n);
+  b('cBox'+n);
+}
+
+function childC(obj)
+{
+  theKid(idNum(obj));
+  var kid = obj.firstElementChild;
+  if (obj == event.target)
+    kid.click();
+  if (kid.type == 'radio')
+    doKid(kid);
+}
+
+function doKid(obj)
+{
+  var n = obj.name.replace(/[^\d]/g, '');
+  x = document.getElementById('priceTxt'+n).style;
+  if (obj.value == 'no')
+    x.fontSize = '14px';
+  else
+    x.fontSize = '20px';
+  totals();
+}
+
+function onFocus(obj)
+{
+  obj.style.background = "#FFCCCC";
+}
+
+function onBlur(obj)
+{
+  obj.style.background = "#FFFFFF";
+  if (obj.id != 'MyIdTxt')
+    txtBlur = true;
+}
+
+function onFocusNotes(obj)
+{
+  if (obj.readOnly)
+    obj.blur();
+  else
+    onFocus(obj);
+}
+
+function onBlurNotes(obj)
+{
+  if (obj.readOnly == true)
+    return;
+  obj.readOnly = true;
+  onBlur(obj);
+  localStorage.notes = obj.value;
+}
+
+function focusNotes(obj)
+{
+  obj.readOnly = false;
+  obj.focus();
+}
+
+function totals()
+{
+  var tot = 0;
+  var s,n,tax;
+  for (var i=1; i<9; i++)
+  {
+    s = document.getElementById('priceTxt'+i);
+    if ((s.value.length > 0) && (s.style.fontSize != '14px'))
+      tot += parseFloat(s.value);
+  }
+  fullAmt.innerText = tot.toFixed(2);
+  tax = tot * 0.0825;
+  tax = tax.toFixed(2);
+  taxTxt.value = tax;
+  var s = parseFloat(prePaidTxt2.value);
+  if ((s != 0) && (!isNaN(s)))
+  {
+    tot -= Math.abs(parseFloat(prePaidTxt2.value));
+    taxSpan.style.display = 'inline';
+  }
+  else
+    taxSpan.style.display = 'none';
+  subTotTxt.value = Math.max(0,tot).toFixed(2);
+  tot += parseFloat(tax);
+  totalTxt.value = Math.max(0,tot).toFixed(2);
+}
+
+function saidNo(obj)
+{
+    goNote(obj[2].checked);
+}
+
+function today()
+{
+  var myDate = '2010-10-11T00:00:00+05:30';
+  myDate = myDate.replace(/^(\d{4})\-(\d{2})\-(\d{2}).*$/, '$2/$3/$1');
+  return myDate;
+}
+
+function undo()
+{
+  if (ticNumTxt.value == '(New)')
+    clearTicket()
+  else
+    getTicket('ticNum=' + ticNumTxt.value,'');
+}
+
+function MyIdPress()
+{
+  if (event.keyCode == 13)
+    MyIdBtn_onclick()
+}
+
+function PaIdPress()
+{
+  if (event.keyCode == 13)
+    PartnerIdBtn_onclick()
+}
+
+function getPic() { document.getElementById("picFile").click() }
+
+    </script>
+
+    <table id="blueTop">
+      <tr>
+        <td align="center">
+          <table align="center" style="width: 856px">
+            <tr>
+              <td style="text-align: center; width: 33%">
+                <input id="Button2" type="button" value="Banner Picture" style="font-family: Arial, Helvetica, sans-serif;
+                  font-size: 18px; height: 25px; width: 150px;" onclick="getPic()" />
+                <input id="picFile" type="file" onchange="getPic(this.files)" style="display: none">
+              </td>
+              <td style="text-align: center; width: 34%">
+                <input id="MyIdTxt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)" onkeypress="MyIdPress()" />
+                <input id="MyIdBtn" type="button" value="Database Name" onclick="return MyIdBtn_onclick()" /><br />
+              </td>
+              <td style="text-align: center; width: 33%">
+                <input id="hideShowBtn" type="button" value="Hide Panel" onclick="return showLog(0)" />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    <table cellpadding="0" cellspacing="0" style="width: 893px">
+      <tr>
+        <td onclick="return showLog(1)">
+          <img id="topPic" width="900px" height="120px" src="" />
+        </td>
+      </tr>
+    </table>
+    <table id="mainTbl" cellpadding="0" cellspacing="0" style="width: 900px; height: 900px;
+      border-style: solid; border-width: 2px; background-color: #FFFFFF;">
+      <tr>
+        <td align="center">
+          <table cellpadding="0" cellspacing="0" style="width: 100%; height: 50px">
+            <tr>
+              <td class="lab" style="width: 209px">
+                First Name:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="fNameTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="1" />
+              </td>
+              <td align="center" rowspan="10">
+                <table align="center" cellpadding="0" cellspacing="0" style="width: 100%; height: 407px;">
+                  <tr>
+                    <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 18px">
+                      <table cellpadding="0" cellspacing="0" style="width: 100%; font-size: 18px">
+                        <tr>
+                          <td style="width: 33px">
+                            &nbsp;
+                          </td>
+                          <td style="width: 54px; font-size: 20px;">
+                            New:
+                          </td>
+                          <td style="width: 143px">
+                            <input id="newDateTxt" readonly="readonly" type="text" />
+                          </td>
+                          <td style="width: 59px; font-size: 20px;">
+                            Ticket:
+                          </td>
+                          <td>
+                            <input id="ticNumTxt" readonly="readonly" type="text" />
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 18px;
+                      text-align: right;">
+                      &nbsp;
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="font-family: Arial, Helvetica, sans-serif; font-size: 24px">
+                      <table cellpadding="0" cellspacing="0" style="width: 100%">
+                        <tr>
+                          <td style="width: 20%; text-align: center;">
+                            &nbsp;
+                          </td>
+                          <td style="font-size: 24px; text-align: center">
+                            Problems:
+                          </td>
+                          <td style="width: 20%; text-align: center;">
+                            <input id="Button1" type="button" value="UNDO" onclick="return undo()" />
+                          </td>
+                        </tr>
+                      </table>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="font-size: 20px; font-family: 'Times New Roman', Times, serif">
+                      <div style="border: 2px solid #000000">
+                        <textarea id="problemTxt" name="S3" onfocus="onFocus(this)" onblur="onBlur(this)"
+                          tabindex="11"></textarea></div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="font-size: 20px; font-family: 'Times New Roman', Times, serif">
+                      Customer Info:
+                    </td>
+                  </tr>
+                  <tr>
+                    <td align="center" style="font-size: 20px; font-family: 'Times New Roman', Times, serif">
+                      <div style="border: 2px solid #000000">
+                        <textarea id="custInfoTxt" name="S13" onfocus="onFocus(this)" onblur="onBlur(this)"
+                          tabindex="11" cols="20"></textarea></div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Last Name:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="LNameTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="2" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Cell Phone:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="cPhoneTxt" class="txt" type="text" tabindex="3" onkeypress="notNumKey(this)"
+                  onfocus="phoneFocus(this)" onblur="phoneBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Home Phone:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="hPhoneTxt" class="txt" type="text" tabindex="4" onkeypress="notNumKey(this)"
+                  onfocus="phoneFocus(this)" onblur="phoneBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Computer Make:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="makeTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="5" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Computer Model:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="modelTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="6" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Password:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="passTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="7" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                AC Adapter Left:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="adapterTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="8" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Other Items Left:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="itemsTxt" class="txt" type="text" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="9" />
+              </td>
+            </tr>
+            <tr>
+              <td class="lab" style="width: 209px">
+                Pre-paid amount:
+              </td>
+              <td style="width: 17px">
+                &nbsp;
+              </td>
+              <td style="width: 245px">
+                <input id="prePaidTxt1" class="txt" type="text" onfocus="onFocus(this)" onblur="depo1Blur(this)"
+                  tabindex="10" />
+              </td>
+            </tr>
+          </table>
+          <table align="center" cellpadding="0" cellspacing="0" border="1" style="width: 100%;
+            font-family: Arial, Helvetica, sans-serif; font-size: 16px;">
+            <tr>
+              <hr />
+              <td colspan="6" style="text-align: center; font-family: Arial, Helvetica, sans-serif;
+                font-size: 24px">
+                Solutions:
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt1" class="sol" name="S4" rows="2" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="12"></textarea>
+              </td>
+              <td id="ask1x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit1" id="ask1" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes1x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit1" id="yes1" value="ok">
+                Yes
+              </td>
+              <td id="no1x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit1" id="no1" value="no">No
+              </td>
+              <td id="cBox1x" style="width: 74px" onclick="return childC(this)">
+                <input id="cBox1" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt1" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt2" class="sol" cols="20" name="S11" rows="2" onfocus="onFocus(this)"
+                  onblur="onBlur(this)" tabindex="13"></textarea>
+              </td>
+              <td id="ask2x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit2" id="ask2" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes2x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit2" id="yes2" value="ok">
+                Yes
+              </td>
+              <td id="no2x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit2" id="no2" value="no">No
+              </td>
+              <td id="cBox2x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox2" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt2" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt3" class="sol" cols="20" name="S10" rows="2" onfocus="onFocus(this)"
+                  onblur="onBlur(this)" tabindex="14"></textarea>
+              </td>
+              <td id="ask3x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit3" id="ask3" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes3x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit3" id="yes3" value="ok">
+                Yes
+              </td>
+              <td id="no3x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit3" id="no3" value="no">No
+              </td>
+              <td id="cBox3x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox3" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt3" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt4" class="sol" name="S9" onfocus="onFocus(this)" onblur="onBlur(this)"
+                  tabindex="15"></textarea>
+              </td>
+              <td id="ask4x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit4" id="ask4" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes4x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit4" id="yes4" value="ok">
+                Yes
+              </td>
+              <td id="no4x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit4" id="no4" value="no">No
+              </td>
+              <td id="cBox4x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox4" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt4" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt5" class="sol" cols="20" name="S8" rows="2" onfocus="onFocus(this)"
+                  onblur="onBlur(this)" tabindex="16"></textarea>
+              </td>
+              <td id="ask5x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit5" id="ask5" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes5x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit5" id="yes5" value="ok">
+                Yes
+              </td>
+              <td id="no5x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit5" id="no5" value="no">No
+              </td>
+              <td id="cBox5x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox5" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt5" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt6" class="sol" cols="20" name="S7" rows="2" onfocus="onFocus(this)"
+                  onblur="onBlur(this)" tabindex="17"></textarea>
+              </td>
+              <td id="ask6x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit6" id="ask6" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes6x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit6" id="yes6" value="ok">
+                Yes
+              </td>
+              <td id="no6x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit6" id="no6" value="no">No
+              </td>
+              <td id="cBox6x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox6" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt6" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt7" class="sol" cols="20" name="S6" rows="2" onfocus="onFocus(this)"
+                  onblur="onBlur(this)" tabindex="18"></textarea>
+              </td>
+              <td id="ask7x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit7" id="ask7" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes7x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit7" id="yes7" value="ok">
+                Yes
+              </td>
+              <td id="no7x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit7" id="no7" value="no">No
+              </td>
+              <td id="cBox7x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox7" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt7" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <textarea id="whatTxt8" class="sol" cols="20" name="S5" rows="2" onfocus="onFocus(this)"
+                  onblur="onBlur(this)" tabindex="19"></textarea>
+              </td>
+              <td id="ask8x" style="width: 65px" onclick="childC(this)">
+                <input type="radio" name="doit8" id="ask8" value="ask" checked="checked" />Ask
+              </td>
+              <td id="yes8x" style="width: 60px" onclick="childC(this)">
+                <input type="radio" name="doit8" id="yes8" value="ok">
+                Yes
+              </td>
+              <td id="no8x" style="width: 52px" onclick="childC(this)">
+                <input type="radio" name="doit8" id="no8" value="no">No
+              </td>
+              <td id="cBox8x" style="width: 74px" onclick="childC(this)">
+                <input id="cBox8" type="checkbox" />
+                Done
+              </td>
+              <td style="width: 73px">
+                <input id="priceTxt8" class="dol" type="text" onfocus="onFocus(this)" onblur="dolBlur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: center" rowspan="4" align="center" valign="middle">
+                <textarea id="notesTxt" name="S12" onfocus="onFocusNotes(this)" onblur="onBlurNotes(this)"
+                  readonly="readonly" ondblclick="focusNotes(this)"></textarea>
+              </td>
+              <td style="font-size: 18px; text-align: right;" colspan="4">
+                &nbsp; Pre-paid: &nbsp;
+              </td>
+              <td style="width: 73px">
+                <input id="prePaidTxt2" class="dol" type="text" onfocus="onFocus(this)" onblur="depo2Blur(this)" />
+              </td>
+            </tr>
+            <tr>
+              <td style="font-size: 18px; text-align: right;" colspan="4">
+                &nbsp; Subtotal: &nbsp;
+              </td>
+              <td style="width: 73px">
+                <input id="subTotTxt" class="dol" type="text" onblur="onBlur(this)" readonly="readonly" />
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right; font-size: 18px;" colspan="4">
+                &nbsp; Tax: &nbsp;<span id="taxSpan" style="display: none">on full $<span id="fullAmt">0.00</span>
+                  &nbsp;</span>
+              </td>
+              <td style="width: 73px">
+                <input id="taxTxt" class="dol" type="text" onblur="onBlur(this)" readonly="readonly" />
+              </td>
+            </tr>
+            <tr>
+              <td style="text-align: right; font-size: 18px;" colspan="4">
+                &nbsp; Total due: &nbsp;
+              </td>
+              <td style="width: 73px">
+                <input id="totalTxt" class="dol" type="text" onblur="onBlur(this)" readonly="readonly" />
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+      <tr>
+      </tr>
+      <tr>
+        <td valign="bottom" style="font-size: 1px;">
+          <div id="grayDiv">
+            &nbsp;
+          </div>
+        </td>
+      </tr>
+    </table>
+    <table id="noteTable" cellpadding="2" style="border-left: 3px solid #000080; border-right: 3px solid #009999;
+      border-top: 3px solid #000080; border-bottom: 3px solid #009999; height: 252px;
+      width: 540px; display: none;" bgcolor="white">
+      <tr>
+        <td align="center">
+          <table style="border-color: #000000; width: 526px;" cellpadding="0" cellspacing="0"
+            border="1" align="center">
+            <tr>
+              <td id="noteTd" bgcolor="#009900" style="height: 179px;">
+                <table cellpadding="0" cellspacing="0" style="width: 100%; height: 100%;">
+                  <tr>
+                    <td style="text-align: center">
+                      <span id="NoteMsg" style="color: #DDFFDD; font-size: 22px; font-family: Arial; text-align: center;">
+                        No message.</span>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+            <tr>
+              <td align="center">
+                <table cellpadding="0" cellspacing="0" background="images/pinkCarpet.jpg" style="width: 100%;
+                  height: 54px;" align="center">
+                  <tr>
+                    <td align="center">
+                      <div id="BnDiv1">
+                        <input id="NoteBtn1" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                          font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                          color: #FFFFFF; height: 50px;" type="button" value="one" onclick="return NoteClick(this.value)" />
+                      </div>
+                    </td>
+                    <td align="center">
+                      <div id="BnDiv2">
+                        <input id="NoteBtn2" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                          font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                          color: #FFFFFF; height: 50px;" type="button" value="two" onclick="return NoteClick(this.value)" />
+                      </div>
+                    </td>
+                    <td align="center">
+                      <div id="BnDiv3">
+                        <input id="NoteBtn3" style="background-image: url('images/buttonBG-dark.png'); border-width: 3px;
+                          font-family: Verdana; font-size: 16px; width: 150px; background-color: #00ff00;
+                          color: #FFFFFF; height: 50px;" type="button" value="three" onclick="return NoteClick(this.value)" />
+                      </div>
+                    </td>
+                  </tr>
+                </table>
+              </td>
+            </tr>
+          </table>
+        </td>
+      </tr>
+    </table>
+    &nbsp;<div id="log2" class="log" style="color: #FF7500; text-shadow: none; padding: 15px;">
+      <strong>Connection&nbsp; status</strong>:<br>
+    </div>
+  </div>
+</body>
+</html>

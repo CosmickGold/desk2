@@ -1,0 +1,182 @@
+﻿<!DOCTYPE html>
+<html lang="en" manifest="index.manifest">
+<head>
+    <meta http-equiv="expires" content="-1">
+    <meta http-equiv="Expires" content="Fri, Jun 12 1981 08:20:00 GMT">
+    <meta http-equiv="CACHE-CONTROL" content="NO-CACHE">
+    <meta http-equiv="PRAGMA" content="NO-CACHE">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=0">
+    <link rel="shortcut icon" href="favicon.ico">
+    <title>Update Chrome</title>
+
+    <script language="javascript" type="text/javascript">    
+// <!CDATA[
+        window.onerror = function(msg,url,line)
+        {
+            alert('******* AN ERROR HAS OCCURRED *******' +
+              '\n\n' +
+              '\nText:' + msg + '\nurl:' + url + '\nline:' + line);
+        }
+// ]]>
+    </script>
+
+    <script type="text/javascript" src="js/shared35.js"></script>
+
+    <script language="javascript" type="text/javascript">
+<!--
+
+var Hue = 1;
+var Depth = 0;
+var red = 255;
+var green = 0;
+var blue = 255;
+
+function colors()
+{
+    Depth += 5;
+    if (Depth > 255)
+    {
+        Depth = 0;
+        Hue++;
+        if (Hue > 6)
+            Hue = 1;
+    }
+    switch (Hue)
+    {
+        case 1:
+            blue = 255-Depth;
+            break;
+        case 2:
+            green = Depth;
+            break;
+        case 3:
+            red = 255-Depth;
+            break;
+        case 4:
+            blue = Depth;
+            break;
+        case 5:
+            green = 255-Depth;
+            break;
+        case 6:
+            red = Depth;
+            break;
+    }
+    document.bgColor = '#' + toHex(red) + toHex(green) + toHex(blue);
+}
+
+function zoomWindow()
+{
+    var Zoom;
+    var w = document.documentElement.clientWidth / 400;
+    var h = document.documentElement.clientHeight / 480;
+    if (w < h)
+        Zoom = w;
+    else
+        Zoom = h;
+    document.body.style.zoom = Math.min(1,Math.max(0.57,Zoom));
+    scroll(0,0);
+}
+
+function pageLoad()
+{
+    vNum.innerHTML = parseInt(window.navigator.appVersion.match(/Chrome\/(\d+)\./)[1], 10);
+    hostSpan.innerText = document.location.host;
+    setInterval('colors()',60);
+}
+
+function noThanks() { parent.highFrame.pageLoadB() }
+
+function getChrome() { top.location.href = 'http://chrome.google.com'; }
+
+// -->
+    </script>
+
+    <style type="text/css">
+        @font-face
+        {
+            font-family: NarrowFamily;
+            src: url('js/Arial Narrow.ttf');
+        }
+    </style>
+</head>
+<body background="images/Google Chrome.png" style="font-family: NarrowFamily;" onload="pageLoad()"
+    onresize="return zoomWindow()" bgcolor="#ff9999">
+    <table align="center" cellpadding="2" cellspacing="4" style="border: 1px solid #C0C0C0">
+        <tr>
+            <td>
+                <table cellpadding="2" cellspacing="4" style="border: 1px solid #808080">
+                    <tr>
+                        <td>
+                            <table cellpadding="2" cellspacing="4" style="border: 1px solid #4D4D4D">
+                                <tr>
+                                    <td>
+                                        <table align="center" cellpadding="2" cellspacing="4" style="border-color: #222222;
+                                            height: 379px;" border="1" frame="border">
+                                            <tr>
+                                                <td align="center" valign="middle" style="width: 377px; background-color: #FFFFFF;">
+                                                    <span style="font-size: 24px"><span style="font-family: 'Times New Roman', Times, serif">
+                                                        OOPS!<br />
+                                                        You are using version <span id="vNum"></span> of the<br />
+                                                    </span></span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                        color: #183DD0">G</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                            color: #E61B31">o</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                color: #F08F00">o</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                    color: #183DD0">g</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                        color: #00A513">l</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                            color: #E61B31">e</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                color: #333333"> </span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                    color: #183DD0">C</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                        color: #E61B31">h</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                            color: #F08F00">r</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                                color: #183DD0">o</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                                    color: #00A513">m</span><span style="font-size: 24px; font-family: Arial; font-weight: bold;
+                                                                                                        color: #E61B31">e</span><span style="font-size: 24px; font-family: 'Times New Roman', Times, serif">
+                                                                                                            web browser.<br />
+                                                                                                            You need version 34 to enable<br />
+                                                                                                            all features of <span style="color: #009900; font-weight: bold">Desk2</span>.<br />
+                                                                                                        </span>
+                                                    <br style="font-size: 24px; font-family: 'Times New Roman', Times, serif" />
+                                                    <span style="font-size: 24px; font-family: 'Times New Roman', Times, serif">Please update
+                                                        <span style="font-size: 24px; font-family: Arial; font-weight: bold; color: #183DD0">
+                                                            G</span><span style="font-size: 24px; font-family: Arial; font-weight: bold; color: #E61B31">o</span><span
+                                                                style="font-size: 24px; font-family: Arial; font-weight: bold; color: #F08F00">o</span><span
+                                                                    style="font-size: 24px; font-family: Arial; font-weight: bold; color: #183DD0">g</span><span
+                                                                        style="font-size: 24px; font-family: Arial; font-weight: bold; color: #00A513">l</span><span
+                                                                            style="font-size: 24px; font-family: Arial; font-weight: bold; color: #E61B31">e</span><span
+                                                                                style="font-size: 24px; font-family: Arial; font-weight: bold; color: #333333">
+                                                                            </span><span style="font-size: 24px; font-family: Arial; font-weight: bold; color: #183DD0">
+                                                                                C</span><span style="font-size: 24px; font-family: Arial; font-weight: bold; color: #E61B31">h</span><span
+                                                                                    style="font-size: 24px; font-family: Arial; font-weight: bold; color: #F08F00">r</span><span
+                                                                                        style="font-size: 24px; font-family: Arial; font-weight: bold; color: #183DD0">o</span><span
+                                                                                            style="font-size: 24px; font-family: Arial; font-weight: bold; color: #00A513">m</span><span
+                                                                                                style="font-size: 24px; font-family: Arial; font-weight: bold; color: #E61B31">e<br />
+                                                                                            </span>now by navigating to:</span><br style="font-size: 24px; font-family: 'Times New Roman', Times, serif" />
+                                                    <a onclick="getChrome()" onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)"
+                                                    style="font-size: 24px; font-family: 'Times New Roman', Times, serif; color: #0000FF; text-decoration: underline;">
+                                                        http://chrome.google.com</a>.<br 
+                                                        style="font-size: 24px; font-family: 'Times New Roman', Times, serif; color: #0000FF; text-decoration: underline;" />
+                                                    <br style="font-size: 24px; font-family: 'Times New Roman', Times, serif" />
+                                                    <span style="font-size: 24px; font-family: 'Times New Roman', Times, serif">Then return
+                                                        to us at:<br />
+                                                    </span><span style="font-size: 24px; font-family: 'Times New Roman', Times, serif;">
+                                                        http://</span><span style="font-size: 24px; font-weight: bold; color: #9900CC;"><span
+                                                            id="hostSpan"></span></span>
+                                                </td>
+                                            </tr>
+                                        </table>
+                                    </td>
+                                </tr>
+                            </table>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+    <p style="text-align: center">
+        <input id="Button1" type="button" value="Not at this time..." onclick="return noThanks()"
+            onmouseover="return Btn_onmouseover(this)" onmouseout="return Btn_onmouseout(this)"/></p>
+</body>
+</html>
